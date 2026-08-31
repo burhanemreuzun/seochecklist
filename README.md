@@ -180,6 +180,10 @@ açıkken skorun yüksek olması bir şey ifade etmez.
 
 - Parola düz metin olarak hiçbir yerde tutulmaz; `.env` içinde yalnızca scrypt özeti bulunur ve
   `.env` sürüm kontrolüne girmez.
+- Özet `scrypt.N.r.p.tuz.anahtar` biçimindedir: ayırıcı nokta, kodlama base64url. `$`, `+`, `/`
+  ve `=` içermez; bazı hosting panelleri ortam değişkenlerini kabuk üzerinden aktardığı için
+  `$16384` gibi parçalar değişken sanılıp siliniyordu. Eski `$` biçimindeki özetler de kabul
+  edilmeye devam eder.
 - Karşılaştırma zamanlama saldırısına kapalıdır (`timingSafeEqual`).
 - Oturum çerezi HMAC ile imzalanır ve `httpOnly` olduğu için JavaScript okuyamaz.
 - Hatalı parola denemeleri IP başına 15 dakikada 10 ile sınırlıdır.
@@ -188,6 +192,8 @@ açıkken skorun yüksek olması bir şey ifade etmez.
   o zaman `Secure` bayrağıyla gönderilir.
 
 Parolayı değiştirmek için `npm run set-password "yeni parola"` çalıştırıp sunucuyu yeniden başlat.
+Sunucuda parola kabul edilmiyorsa önce `/api/health` çıktısındaki `auth` alanına bak: `kurulu`
+değilse özet ya girilmemiştir ya da taşınırken bozulmuştur.
 Bu, açık olan tüm oturumları geçersiz kılmaz; oturumları da düşürmek istiyorsan `.env` içindeki
 `SESSION_SECRET` değerini sil ve komutu tekrar çalıştır.
 

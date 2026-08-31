@@ -22,26 +22,55 @@ const SESSION_DAYS = 30;
 
 const SCRYPT = { N: 16384, r: 8, p: 1, keylen: 64 };
 
-/** Düz parolayı ".env" içinde saklanabilir bir özete çevirir. */
+/**
+ * Düz parolayı ".env" ya da hosting panelinde saklanabilir bir özete çevirir.
+ *
+ * Biçim:  scrypt.N.r.p.<tuz>.<anahtar>   — ayırıcı nokta, kodlama base64url
+ *
+ * Ayırıcı olarak "$" KULLANILMAZ. Bazı hosting panelleri ortam değişkenlerini
+ * süreçlere kabuk üzerinden aktarır; orada "$16384" bir değişken sanılıp
+ * silinir ve özet sessizce bozulur. base64url ayrıca "+", "/" ve "=" üretmez,
+ * yani değer her ortamda olduğu gibi taşınır.
+ */
 function hashPassword(plain) {
   const salt = crypto.randomBytes(16);
   const key = crypto.scryptSync(plain.normalize('NFKC'), salt, SCRYPT.keylen, {
     N: SCRYPT.N, r: SCRYPT.r, p: SCRYPT.p,
   });
-  return `scrypt$${SCRYPT.N}$${SCRYPT.r}$${SCRYPT.p}$${salt.toString('base64')}$${key.toString('base64')}`;
+  return ['scrypt', SCRYPT.N, SCRYPT.r, SCRYPT.p,
+          salt.toString('base64url'), key.toString('base64url')].join('.');
 }
+
+/** Özeti bileşenlerine ayırır; hem yeni (nokta) hem eski ($) biçimi tanır. */
+function parseHash(stored) {
+  const raw = String(stored || '').trim();
+  const parts = raw.includes('.') && raw.startsWith('scrypt.') ? raw.split('.') : raw.split('$');
+  if (parts.length !== 6 || parts[0] !== 'scrypt') return null;
+
+  const [, N, r, p, salt, key] = parts;
+  if (![N, r, p].every((n) => Number.isInteger(Number(n)) && Number(n) > 0)) return null;
+
+  // base64url ve klasik base64'ün ikisi de çözülür.
+  const dec = (v) => Buffer.from(v, /[-_]/.test(v) || !/[+/=]/.test(v) ? 'base64url' : 'base64');
+  const saltBuf = dec(salt);
+  const keyBuf = dec(key);
+  if (!saltBuf.length || !keyBuf.length) return null;
+
+  return { N: Number(N), r: Number(r), p: Number(p), salt: saltBuf, key: keyBuf };
+}
+
+/** Özetin yapısal olarak geçerli olup olmadığını söyler (teşhis için). */
+const isHashWellFormed = (stored) => parseHash(stored) !== null;
 
 /** Girilen parolayı saklanan özetle karşılaştırır. Zamanlama sızıntısı yapmaz. */
 function verifyPassword(plain, stored) {
   try {
-    const [scheme, N, r, p, saltB64, keyB64] = String(stored).split('$');
-    if (scheme !== 'scrypt') return false;
-    const salt = Buffer.from(saltB64, 'base64');
-    const expected = Buffer.from(keyB64, 'base64');
-    const actual = crypto.scryptSync(String(plain).normalize('NFKC'), salt, expected.length, {
-      N: Number(N), r: Number(r), p: Number(p),
+    const h = parseHash(stored);
+    if (!h) return false;
+    const actual = crypto.scryptSync(String(plain).normalize('NFKC'), h.salt, h.key.length, {
+      N: h.N, r: h.r, p: h.p,
     });
-    return crypto.timingSafeEqual(expected, actual);
+    return crypto.timingSafeEqual(h.key, actual);
   } catch {
     return false;
   }
@@ -158,7 +187,7 @@ setInterval(() => {
 }, WINDOW_MS).unref();
 
 module.exports = {
-  hashPassword, verifyPassword,
+  hashPassword, verifyPassword, isHashWellFormed,
   issueToken, verifyToken, isAuthenticated, requireAuth,
   setSessionCookie, clearSessionCookie, readCookie,
   rateLimit, resetRateLimit,

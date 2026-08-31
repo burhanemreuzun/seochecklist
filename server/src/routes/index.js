@@ -147,7 +147,11 @@ router.get('/health', wrap(async (_req, res) => {
     ok: database === 'açık',
     database,
     ...(dbError ? { databaseError: dbError } : {}),
-    auth: process.env.APP_PASSWORD_HASH ? 'kurulu' : 'PAROLA TANIMLI DEĞİL',
+    auth: !process.env.APP_PASSWORD_HASH
+      ? 'PAROLA TANIMLI DEĞİL'
+      : auth.isHashWellFormed(process.env.APP_PASSWORD_HASH)
+        ? 'kurulu'
+        : 'PAROLA ÖZETİ BOZUK — değer taşınırken kırpılmış olabilir',
     ai: process.env.GEMINI_API_KEY
       ? { enabled: true, model: process.env.GEMINI_MODEL || 'gemini-3.7-flash' }
       : { enabled: false, model: null },
