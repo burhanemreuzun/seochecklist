@@ -1,34 +1,39 @@
 # SEO Kontrol Listesi
 
-WordPress'e yazi giren editorun **yayindan once** gecmesi gereken 58 maddelik kontrol listesi
-ve bu maddelerin buyuk kismini otomatik olcen bir denetim motoru.
+WordPress'e yazı giren editörün **yayından önce** geçmesi gereken 58 maddelik kontrol listesi
+ve bu maddelerin büyük kısmını otomatik ölçen bir denetim motoru.
 
-Editor "Kontrol Et"e basar, uygulama sayfayi gercekten indirir, ayristirir ve maddeleri tek tek
-degerlendirir. Sonuc bir skor ve **yayin kapisi**dir: kritik maddeler kapanmadan yazi yayina gitmez.
+Editör "Kontrol Et"e basar; uygulama sayfayı gerçekten indirir, ayrıştırır ve maddeleri tek tek
+değerlendirir. Sonuç bir skor ve bir **yayın kapısı**dır: kritik maddeler kapanmadan yazı yayına
+gitmez.
 
 ---
 
-## Neden bu tasarim?
+## Neden bu tasarım?
 
-Bu tur listelerde bilinen sorun sudur: editor okumadan hepsini isaretler ve liste bir tiyatroya doner.
+Bu tür listelerde bilinen sorun şudur: editör okumadan hepsini işaretler ve liste bir tiyatroya
+döner.
 
-Bunu engellemek icin maddeler uc gruba ayrildi:
+Bunu engellemek için maddeler üç gruba ayrıldı:
 
-| Tur | Kim karar verir | Editor isaretleyebilir mi? |
+| Tür | Kim karar verir | Editör işaretleyebilir mi? |
 | --- | --- | --- |
-| `otomatik` (40 madde) | Kural motoru sayfayi olcer | **Hayir.** Kutucuk bile cikmaz. |
-| `yapay zeka` (7 madde) | Gemini icerigi degerlendirir | **Hayir.** |
-| `elle` (11 madde) | Editor kontrol edip isaretler | Evet |
+| `otomatik` (40 madde) | Kural motoru sayfayı ölçer | **Hayır.** Kutucuk bile çıkmaz. |
+| `yapay zekâ` (7 madde) | Gemini içeriği değerlendirir | **Hayır.** |
+| `elle` (11 madde) | Editör kontrol edip işaretler | Evet |
 
-Yani **makinenin olcebildigi hicbir maddede editor "yaptim" diyemez.** Baslik uzunlugu, heading
-hiyerarsisi, meta aciklama, alt metinler, canonical, kirik linkler — hepsi olculur, beyan edilmez.
-Editorun isaretleyecegi 11 madde ise gercekten disaridan olculemeyen seylerdir (icerigin ozgunlugu,
-eski yazidan link verilmesi, Search Console'a gonderim gibi).
+Yani **makinenin ölçebildiği hiçbir maddede editör "yaptım" diyemez.** Başlık uzunluğu, başlık
+hiyerarşisi, meta açıklama, alternatif metinler, canonical, kırık bağlantılar — hepsi ölçülür,
+beyan edilmez. Bu kural yalnızca arayüzde değil, API'de de uygulanır: otomatik bir maddeyi elle
+işaretlemeye çalışan istek 409 ile reddedilir.
 
-Ikinci karar: **olculebilen hicbir sey yapay zekaya birakilmadi.** LLM karakter saymaz, `<h3>`
-saymaz. Sadece yorum gerektiren 7 maddede calisir (meta aciklamanin ikna gucu, alt basliklarin
-anlamliligi, imla, alintilanabilir ozet paragrafi vb.). Bu sayede AI anahtari olmasa bile
-denetimin %85'i calismaya devam eder.
+Editörün işaretleyeceği 11 madde ise gerçekten dışarıdan ölçülemeyen şeylerdir: içeriğin
+özgünlüğü, eski bir yazıdan bağlantı verilmesi, Search Console'a gönderim, son okuma.
+
+İkinci karar: **ölçülebilen hiçbir şey yapay zekâya bırakılmadı.** Model karakter saymaz, `<h3>`
+saymaz. Yalnızca yorum gerektiren 7 maddede çalışır: meta açıklamanın ikna gücü, alt başlıkların
+anlamlılığı, imla, alıntılanabilir özet paragrafı. Bu sayede Gemini anahtarı olmasa bile denetimin
+%85'i çalışmaya devam eder.
 
 ---
 
@@ -39,23 +44,23 @@ Gereksinimler: **Node.js 20+**, **MySQL 8+**
 ```bash
 git clone https://github.com/burhanemreuzun/seochecklist.git
 cd seochecklist
-cp .env.example .env      # ayarlari doldur
-npm run setup             # bagimliliklar + veritabani + 58 madde
+cp .env.example .env      # ayarları doldur
+npm run setup             # bağımlılıklar, veritabanı ve 58 madde
 ```
 
-`.env` icinde en az sunlari ayarla:
+`.env` içinde en az şunları ayarla:
 
 ```ini
 DB_USER=root
 DB_PASSWORD=parolan
-GEMINI_API_KEY=...        # bos birakilabilir; o zaman 7 AI maddesi atlanir
+GEMINI_API_KEY=...        # boş bırakılabilir; o zaman 7 yapay zekâ maddesi atlanır
 ```
 
-Gemini anahtari: <https://aistudio.google.com/apikey>
+Gemini anahtarı: <https://aistudio.google.com/apikey>
 
-### Calistirma
+### Çalıştırma
 
-Gelistirme (iki terminal):
+Geliştirme ortamı (iki terminal):
 
 ```bash
 npm run dev:server
@@ -65,36 +70,36 @@ npm run dev:server
 npm run dev:client
 ```
 
-Arayuz: <http://localhost:5173>
+Arayüz: <http://localhost:5173>
 
-Yayin icin:
+Yayın için:
 
 ```bash
 npm run build && npm start
 ```
 
-Tek sunucu hem API'yi hem derlenmis arayuzu <http://localhost:3001> adresinden verir.
+Tek sunucu hem API'yi hem de derlenmiş arayüzü <http://localhost:3001> adresinden verir.
 
 ---
 
-## Kullanim
+## Kullanım
 
-1. **Kayit ac** — yazi basligi, odak anahtar kelime, URL.
-2. **Yaz ve yayinla** (ya da onizleme URL'i kullan).
-3. **Kontrol Et** — sayfa indirilir, 47 madde otomatik degerlendirilir.
-4. **Kirmizi maddeleri duzelt**, tekrar kontrol et.
-5. **Elle isaretlenecek 11 maddeyi** kontrol edip isaretle.
-6. Yayin kapisi yesile donunce yayinla.
+1. **Kayıt aç** — yazı başlığı, odak anahtar kelime, adres.
+2. **Yaz ve yayınla** (ya da önizleme adresini kullan).
+3. **Kontrol Et** — sayfa indirilir, 47 madde otomatik değerlendirilir.
+4. **Kırmızı maddeleri düzelt**, tekrar kontrol et.
+5. **Elle işaretlenecek 11 maddeyi** kontrol edip işaretle.
+6. Yayın kapısı yeşile dönünce yayınla.
 
-### Terminalden hizli denetim
+### Terminalden hızlı denetim
 
-Veritabani gerektirmez, tek komutla calisir:
+Veritabanı gerektirmez, tek komutla çalışır:
 
 ```bash
 npm run check https://siteadi.com/yazi-adresi/ "odak anahtar kelime"
 ```
 
-`--all` eklersen gecen maddeler de listelenir.
+`--tumu` eklersen geçen maddeler de listelenir.
 
 ---
 
@@ -107,7 +112,7 @@ client/                Vue 3 + Vite arayuz
   src/components/      ChecklistItem
 server/
   src/audit/
-    fetch.js           sayfa indirme, link/gorsel yoklama (HEAD)
+    fetch.js           sayfa indirme, bağlantı ve görsel yoklama (HEAD)
     extract.js         HTML → yapisal olgular (cheerio)
     rules.js           40 deterministik kural
     ai.js              7 madde · Gemini (gemini-3.7-flash)
@@ -121,54 +126,55 @@ docs/CHECKLIST.md      yazdirilabilir liste (seed'den uretilir)
 
 ### Skorlama
 
-Skor yalnizca **otomatik olculebilen** maddeler uzerinden hesaplanir; her madde agirligiyla
-(`weight`) carpilir: gecti = 1, uyari = 0,5, hata = 0. Elle isaretlenen maddeler skoru sismesin
-diye hesaba katilmaz — onlar yayin kapisinda denetlenir.
+Skor yalnızca **otomatik ölçülebilen** maddeler üzerinden hesaplanır; her madde ağırlığıyla
+(`weight`) çarpılır: geçti = 1, uyarı = 0,5, hata = 0. Elle işaretlenen maddeler skoru şişirmesin
+diye hesaba katılmaz; onlar yayın kapısında denetlenir.
 
-**Yayin kapisi** ise skordan bagimsizdir: `critical` maddelerden biri bile hatali ya da
-isaretlenmemisse kapi kirmizi kalir. 90 puan alip yine de yayinlayamayabilirsin — kritik bir
-madde acikken skorun yuksek olmasi bir sey ifade etmez.
+**Yayın kapısı** skordan bağımsızdır: `critical` maddelerden biri bile hatalıysa ya da
+işaretlenmemişse kapı kırmızı kalır. 90 puan alıp yine de yayınlayamayabilirsin — kritik bir madde
+açıkken skorun yüksek olması bir şey ifade etmez.
 
-### Madde ekleme / degistirme
+### Madde ekleme ve değiştirme
 
 Tek dosya: `server/src/db/checklist.seed.js`
 
 ```bash
-npm run db:seed                        # veritabanina uygula
-node server/src/db/export-md.js        # docs/CHECKLIST.md'yi yenile
+npm run db:seed                        # veritabanına uygula
+node server/src/db/export-md.js        # docs/CHECKLIST.md dosyasını yenile
 ```
 
-`code` alanlarini **degistirme** — gecmis denetim kayitlari onlara bagli. Listeden cikarilan
-madde silinmez, pasife alinir.
+`code` alanlarını **değiştirme**; geçmiş denetim kayıtları onlara bağlıdır. Listeden çıkarılan
+madde silinmez, pasife alınır.
 
-Yeni bir `rule` maddesi eklersen `rules.js` icine ayni kodla bir fonksiyon yazmalisin; yeni bir
-`ai` maddesi eklersen `ai.js` icindeki `AI_CODES` ve `CRITERIA` guncellenmeli.
+Yeni bir `rule` maddesi eklersen `rules.js` içine aynı kodla bir fonksiyon yazmalısın. Yeni bir
+`ai` maddesi eklersen `ai.js` içindeki `AI_CODES` ve `CRITERIA` güncellenmelidir.
 
 ---
 
 ## API
 
-| Yontem | Adres | Aciklama |
+| Yöntem | Adres | Açıklama |
 | --- | --- | --- |
-| `GET` | `/api/health` | Veritabani ve AI durumu |
-| `GET` | `/api/checklist` | Kategoriler + maddeler |
-| `GET` | `/api/posts` | Yazi listesi (`?status=`, `?q=`) |
-| `POST` | `/api/posts` | Yazi kaydi ac |
-| `GET` | `/api/posts/:id` | Yazi + isaretler + son denetim |
-| `PATCH` | `/api/posts/:id` | Yaziyi guncelle |
-| `DELETE` | `/api/posts/:id` | Yaziyi sil |
-| `PUT` | `/api/posts/:id/checks/:code` | Elle isaretle |
+| `GET` | `/api/health` | Veritabanı ve yapay zekâ durumu |
+| `GET` | `/api/checklist` | Kategoriler ve maddeler |
+| `GET` | `/api/posts` | Yazı listesi (`?status=`, `?q=`) |
+| `POST` | `/api/posts` | Yazı kaydı aç |
+| `GET` | `/api/posts/:id` | Yazı, işaretler ve son denetim |
+| `PATCH` | `/api/posts/:id` | Yazıyı güncelle |
+| `DELETE` | `/api/posts/:id` | Yazıyı sil |
+| `PUT` | `/api/posts/:id/checks/:code` | Elle işaretle (yalnızca `manual` maddeler) |
 | `POST` | `/api/posts/:id/audit` | Denetle ve kaydet |
-| `POST` | `/api/audit` | Kayit acmadan tek seferlik denetim |
-| `GET` | `/api/posts/:id/audits` | Denetim gecmisi |
+| `POST` | `/api/audit` | Kayıt açmadan tek seferlik denetim |
+| `GET` | `/api/posts/:id/audits` | Denetim geçmişi |
 
 ---
 
-## Bilinen sinirlar
+## Bilinen sınırlar
 
-- Denetim, sayfanin **sunucudan gelen HTML'i** uzerinde calisir. Icerigi tamamen JavaScript ile
-  cizen temalarda olcumler eksik kalir (WordPress temalarinin buyuk cogunlugu bundan etkilenmez).
-- Kirik link kontrolu ilk 25 linki, gorsel agirligi ilk 15 gorseli yoklar.
-- `TTL_04` (baslik benzersizligi) ve `MTA_06` (aciklama benzersizligi) site genelinde tarama
-  gerektirdigi icin elle isaretlenir.
-- Sayfa hizi (`TEC_07`) PageSpeed Insights'a birakildi; entegre edilmedi.
+- Denetim, sayfanın **sunucudan gelen HTML'i** üzerinde çalışır. İçeriği tamamen JavaScript ile
+  çizen temalarda ölçümler eksik kalır; WordPress temalarının büyük çoğunluğu bundan etkilenmez.
+- Kırık bağlantı kontrolü ilk 25 bağlantıyı, görsel ağırlığı ilk 15 görseli yoklar.
+- `TTL_04` (başlık benzersizliği) ve `MTA_06` (açıklama benzersizliği) site genelinde tarama
+  gerektirdiği için elle işaretlenir.
+- Sayfa hızı (`TEC_07`) PageSpeed Insights'a bırakıldı, entegre edilmedi.
+- Arayüzde koyu tema yok.

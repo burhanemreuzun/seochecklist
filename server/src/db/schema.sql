@@ -1,5 +1,5 @@
--- SEO Checklist veritabani semasi (MySQL 8+)
--- Karakter seti: Turkce icerik icin utf8mb4 zorunlu.
+-- SEO Kontrol Listesi veritabanı şeması (MySQL 8+)
+-- Karakter seti: Türkçe içerik için utf8mb4 zorunludur.
 
 CREATE TABLE IF NOT EXISTS categories (
   `key`   VARCHAR(32)  NOT NULL PRIMARY KEY,
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS checklist_items (
   INDEX idx_item_category (category_key, sort)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Denetlenen her yazi bir "post" kaydidir.
+-- Denetlenen her yazı bir "post" kaydıdır.
 CREATE TABLE IF NOT EXISTS posts (
   id            INT AUTO_INCREMENT PRIMARY KEY,
   title         VARCHAR(255) NOT NULL,
@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS posts (
   INDEX idx_post_status (status, updated_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Editorun elle isaretledigi kutucuklar.
+-- Editörün elle işaretlediği kutucuklar.
 CREATE TABLE IF NOT EXISTS post_checks (
   id         INT AUTO_INCREMENT PRIMARY KEY,
   post_id    INT NOT NULL,
@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS post_checks (
     ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- "Kontrol et" calistirildiginda uretilen denetim kaydi.
+-- "Kontrol Et" çalıştırıldığında üretilen denetim kaydı.
 CREATE TABLE IF NOT EXISTS audits (
   id           INT AUTO_INCREMENT PRIMARY KEY,
   post_id      INT NULL,
@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS audits (
   INDEX idx_audit_post (post_id, created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Denetimin madde bazindaki sonuclari.
+-- Denetimin madde bazındaki sonuçları.
 CREATE TABLE IF NOT EXISTS audit_findings (
   id         INT AUTO_INCREMENT PRIMARY KEY,
   audit_id   INT NOT NULL,

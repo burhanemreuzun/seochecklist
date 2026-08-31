@@ -1,5 +1,5 @@
 /**
- * Veritabanini ve tablolari olusturur. Idempotent: tekrar tekrar calistirilabilir.
+ * Veritabanını ve tabloları oluşturur. Tekrar tekrar çalıştırılabilir, zarar vermez.
  *   npm run db:migrate
  */
 require('dotenv').config({ quiet: true, path: require('path').join(__dirname, '../../../.env') });
@@ -19,9 +19,9 @@ const { serverConnection, config } = require('./pool');
     const sql = fs.readFileSync(path.join(__dirname, 'schema.sql'), 'utf8');
     await conn.query(sql);
 
-    console.log(`✔ Veritabani hazir: ${config.database} @ ${config.host}:${config.port}`);
+    console.log(`✔ Veritabanı hazır: ${config.database} @ ${config.host}:${config.port}`);
   } catch (err) {
-    console.error('✖ Migration hatasi:', err.message);
+    console.error('✖ Veritabanı kurulum hatası:', err.message);
     process.exitCode = 1;
   } finally {
     await conn.end();

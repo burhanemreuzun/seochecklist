@@ -1,12 +1,12 @@
 /**
- * Denetim orkestratoru.
+ * Denetim orkestratörü.
  *
- * Akis:  sayfayi cek → HTML'i ayristir → link/gorsel yokla →
- *        kural motorunu calistir → AI maddelerini degerlendir → skorla
+ * Akış:  sayfayı çek → HTML'i ayrıştır → bağlantı ve görselleri yokla →
+ *        kural motorunu çalıştır → yapay zekâ maddelerini değerlendir → skorla
  *
- * Tasarim karari: olculebilen her sey kural motorunda olculur (deterministik,
- * ucretsiz, tekrarlanabilir). Yapay zeka sadece yorum gerektiren 7 maddede
- * devreye girer. Bu sayede AI kapali olsa bile denetimin buyuk kismi calisir.
+ * Tasarım kararı: ölçülebilen her şey kural motorunda ölçülür; deterministik,
+ * ücretsiz ve tekrarlanabilir. Yapay zekâ yalnızca yorum gerektiren 7 maddede
+ * devreye girer. Böylece anahtar tanımlı olmasa bile denetimin büyük kısmı çalışır.
  */
 
 const { fetchPage, probe, mapLimit } = require('./fetch');
@@ -22,35 +22,35 @@ const PROBE_CONCURRENCY = 6;
 const ITEM_BY_CODE = Object.fromEntries(ITEMS.map((i) => [i.code, i]));
 
 /**
- * @param {string} url            denetlenecek sayfa
+ * @param {string} url                    denetlenecek sayfanın adresi
  * @param {object} opts
- * @param {string} [opts.focusKeyword]
- * @param {boolean} [opts.useAi=true]
+ * @param {string}  [opts.focusKeyword]   odak anahtar kelime
+ * @param {boolean} [opts.useAi=true]     yapay zekâ maddeleri değerlendirilsin mi
  */
 async function auditUrl(url, opts = {}) {
   const startedAt = Date.now();
   const focusKeyword = (opts.focusKeyword || '').trim() || null;
   const useAi = opts.useAi !== false;
 
-  // 1) Sayfayi cek
+  // 1) Sayfayı çek
   let res;
   try {
     res = await fetchPage(url);
   } catch (err) {
-    const reason = err.name === 'AbortError' ? 'Sayfa zaman asimina ugradi.' : err.message;
-    throw Object.assign(new Error(`Sayfa cekilemedi: ${reason}`), { code: 'FETCH_FAILED' });
+    const reason = err.name === 'AbortError' ? 'Sayfa zaman aşımına uğradı.' : err.message;
+    throw Object.assign(new Error(`Sayfa çekilemedi: ${reason}`), { code: 'FETCH_FAILED' });
   }
   if (!res.ok) {
-    throw Object.assign(new Error(`Sayfa ${res.status} donduruyor - once bu hatayi cozmelisin.`), {
+    throw Object.assign(new Error(`Sayfa ${res.status} döndürüyor — önce bu hatayı çözmelisin.`), {
       code: 'BAD_STATUS',
       status: res.status,
     });
   }
 
-  // 2) Ayristir
+  // 2) Ayrıştır
   const page = extract(res.html, res.finalUrl, res.headers);
 
-  // 3) Link ve gorselleri yokla (kirik link + gorsel agirligi icin)
+  // 3) Bağlantı ve görselleri yokla (kırık bağlantı ve görsel ağırlığı için)
   const linkTargets = [...new Set(page.links.map((l) => l.href))].slice(0, MAX_LINK_PROBES);
   const imageTargets = [...new Set((page.contentImages.length ? page.contentImages : page.images).map((i) => i.src))]
     .slice(0, MAX_IMAGE_PROBES);
@@ -60,13 +60,13 @@ async function auditUrl(url, opts = {}) {
     mapLimit(imageTargets, PROBE_CONCURRENCY, probe),
   ]);
 
-  // 4) Kural motoru + 5) AI (paralel)
+  // 4) Kural motoru, 5) yapay zekâ
   const ruleResults = runRules(page, { focusKeyword, linkProbes, imageProbes });
   const ai = useAi
     ? await runAi(page, focusKeyword)
-    : { used: false, reason: 'AI kontrolu bu calistirmada kapatildi.', results: {} };
+    : { used: false, reason: 'Yapay zekâ kontrolü bu çalıştırmada kapatıldı.', results: {} };
 
-  // 6) Tum maddeleri birlestir
+  // 6) Tüm maddeleri birleştir
   const findings = ITEMS.map((item) => {
     const r = ruleResults[item.code] || ai.results?.[item.code];
     if (r) return { code: item.code, ...r };
@@ -74,11 +74,11 @@ async function auditUrl(url, opts = {}) {
       code: item.code,
       status: 'manual',
       source: 'manual',
-      message: 'Bu madde otomatik olculemez - kontrol edip elle isaretlemelisin.',
+      message: 'Bu madde otomatik ölçülemez — kontrol edip elle işaretlemelisin.',
     };
   });
 
-  // 7) Skor: sadece otomatik olculebilen maddeler uzerinden
+  // 7) Skor: yalnızca otomatik ölçülebilen maddeler üzerinden
   const scored = findings.filter((f) => ['pass', 'warn', 'fail'].includes(f.status));
   const weightOf = (f) => ITEM_BY_CODE[f.code]?.weight || 1;
   const earned = scored.reduce((sum, f) => sum + weightOf(f) * (f.status === 'pass' ? 1 : f.status === 'warn' ? 0.5 : 0), 0);

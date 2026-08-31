@@ -1,6 +1,6 @@
 const cheerio = require('cheerio');
 
-/** Icerik govdesini bulmak icin sirayla denenen secicilar. */
+/** İçerik gövdesini bulmak için sırayla denenen seçiciler. */
 const CONTENT_SELECTORS = [
   'article .entry-content',
   '.entry-content',
@@ -24,7 +24,7 @@ function absolute(href, base) {
   }
 }
 
-/** HTML'den denetim kurallarinin ihtiyac duydugu tum olgulari cikarir. */
+/** HTML'den, denetim kurallarının ihtiyaç duyduğu tüm olguları çıkarır. */
 function extract(html, pageUrl, headers = {}) {
   const $ = cheerio.load(html);
   const base = pageUrl;
@@ -49,7 +49,7 @@ function extract(html, pageUrl, headers = {}) {
   const robotsMeta = (metaOf('robots') || '').toLowerCase();
   const xRobots = String(headers['x-robots-tag'] || '').toLowerCase();
 
-  // ── icerik govdesi ──────────────────────────────────────
+  // ── içerik gövdesi ──────────────────────────────────────
   let $content = null;
   for (const sel of CONTENT_SELECTORS) {
     const found = $(sel).first();
@@ -61,14 +61,14 @@ function extract(html, pageUrl, headers = {}) {
   const scopedContent = !!$content;
   if (!$content) $content = $('body');
 
-  // Navigasyon/altbilgi gurultusunu metin olcumlerinden dusur.
+  // Gezinme ve altbilgi gürültüsünü metin ölçümlerinden düşür.
   const $clean = $content.clone();
   $clean.find('nav, header, footer, aside, script, style, noscript, .comments, #comments, .sidebar').remove();
 
   const bodyText = text($clean.text());
   const wordCount = words(bodyText).length;
 
-  // ── heading'ler ─────────────────────────────────────────
+  // ── başlıklar ───────────────────────────────────────────
   const headings = [];
   $('h1, h2, h3, h4, h5, h6').each((_, el) => {
     const $el = $(el);
@@ -80,7 +80,7 @@ function extract(html, pageUrl, headers = {}) {
       hasImage: $el.find('img, svg').length > 0,
       hasLink: $el.find('a').length > 0,
       inContent: scopedContent ? $el.closest($content).length > 0 : true,
-      // Basligin altinda bir sonraki basliga kadar kac kelime var (bos bolum tespiti)
+      // Başlığın altında, bir sonraki başlığa kadar kaç kelime var (boş bölüm tespiti)
       textAfterWords: words($el.nextUntil('h1, h2, h3, h4, h5, h6').text()).length,
     });
   });
@@ -94,7 +94,7 @@ function extract(html, pageUrl, headers = {}) {
   const listCount = $clean.find('ul li, ol li').length;
   const tableCount = $clean.find('table').length;
 
-  // ── gorseller ───────────────────────────────────────────
+  // ── görseller ───────────────────────────────────────────
   const images = [];
   $('img').each((_, el) => {
     const $el = $(el);
@@ -118,7 +118,7 @@ function extract(html, pageUrl, headers = {}) {
     });
   });
 
-  // ── baglantilar ─────────────────────────────────────────
+  // ── bağlantılar ─────────────────────────────────────────
   const links = [];
   $clean.find('a[href]').each((_, el) => {
     const $el = $(el);
@@ -128,7 +128,7 @@ function extract(html, pageUrl, headers = {}) {
     try { internal = new URL(href).hostname === u.hostname; } catch {}
     links.push({
       href,
-      anchor: text($el.text()) || (text($el.find('img').attr('alt')) ? '[gorsel]' : ''),
+      anchor: text($el.text()) || (text($el.find('img').attr('alt')) ? '[görsel]' : ''),
       isImageLink: $el.find('img').length > 0 && !text($el.text()),
       rel: ($el.attr('rel') || '').toLowerCase(),
       target: $el.attr('target') || '',
@@ -136,7 +136,7 @@ function extract(html, pageUrl, headers = {}) {
     });
   });
 
-  // ── yazar / tarih ───────────────────────────────────────
+  // ── yazar ve tarih ──────────────────────────────────────
   const publishedAt =
     metaOf('article:published_time') ||
     text($('time[datetime]').first().attr('datetime')) ||

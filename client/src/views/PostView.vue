@@ -8,10 +8,10 @@ const props = defineProps({ id: { type: [String, Number], required: true } });
 const categories = ref([]);
 const items = ref([]);
 const post = ref(null);
-const checks = ref({});          // code -> post_checks satiri
+const checks = ref({});          // code -> post_checks satırı
 const findings = ref({});        // code -> bulgu
 const audit = ref(null);
-const lastRun = ref(null);       // denetimden donen tam sonuc
+const lastRun = ref(null);       // denetimden dönen tam sonuç
 
 const loading = ref(true);
 const auditing = ref(false);
@@ -23,7 +23,7 @@ const showOnly = ref('all');     // all | problems | manual
 const STATUS_OPTS = [
   { v: 'draft', l: 'Taslak' },
   { v: 'review', l: 'Kontrolde' },
-  { v: 'published', l: 'Yayinda' },
+  { v: 'published', l: 'Yayında' },
 ];
 
 // ─────────────────────── veri ───────────────────────
@@ -50,7 +50,7 @@ watch(() => props.id, load);
 // ─────────────────────── eylemler ───────────────────────
 async function runAudit() {
   if (!post.value?.url) {
-    error.value = 'Once yazinin URL\'ini gir.';
+    error.value = 'Önce yazının adresini gir.';
     return;
   }
   auditing.value = true;
@@ -87,23 +87,32 @@ async function toggle(code, value) {
   }
 }
 
+// Kaydetme 500 ms geciktirilir. Bekleyen değişiklikler BİRİKTİRİLİR: aksi halde
+// 500 ms içinde iki ayrı alan değiştirildiğinde ilki sunucuya hiç gitmiyordu.
 let saveTimer;
+let pending = {};
 function savePost(patch) {
   post.value = { ...post.value, ...patch };
+  pending = { ...pending, ...patch };
   clearTimeout(saveTimer);
   saveTimer = setTimeout(async () => {
+    const body = pending;
+    pending = {};
     saving.value = true;
     try {
-      await api.updatePost(post.value.id, patch);
+      await api.updatePost(post.value.id, body);
+      error.value = '';
     } catch (err) {
       error.value = err.message;
+      // Reddedilen değişiklikleri geri yükle ki ekran sunucuyla tutarlı kalsın.
+      await load();
     } finally {
       saving.value = false;
     }
   }, 500);
 }
 
-// ─────────────────────── turetilmis durum ───────────────────────
+// ─────────────────────── türetilmiş durum ───────────────────────
 function statusOf(item) {
   if (item.mode === 'manual') return checks.value[item.code]?.is_checked ? 'pass' : 'manual';
   const f = findings.value[item.code];
@@ -116,7 +125,7 @@ const summary = computed(() => {
   return acc;
 });
 
-/** Yayini engelleyen maddeler: kritik + (otomatik hata veya isaretlenmemis manuel). */
+/** Yayını engelleyen maddeler: kritik olup hatalı ya da henüz kapatılmamış olanlar. */
 const blockers = computed(() =>
   items.value.filter((i) => {
     if (i.severity !== 'critical') return false;
@@ -146,20 +155,23 @@ const grouped = computed(() =>
     .filter((c) => c.items.length)
 );
 
+// Atlanan maddeler (ör. meta açıklama yoksa uzunluğu ölçülemez) paydaya girmez;
+// aksi halde kategori hiçbir zaman tamamlanmış görünmezdi.
 function catStat(cat) {
   const all = items.value.filter((i) => i.category_key === cat.key);
-  const done = all.filter((i) => statusOf(i) === 'pass').length;
+  const uygulanabilir = all.filter((i) => statusOf(i) !== 'skip');
+  const done = uygulanabilir.filter((i) => statusOf(i) === 'pass').length;
   const bad = all.filter((i) => statusOf(i) === 'fail').length;
-  return { done, total: all.length, bad };
+  return { done, total: uygulanabilir.length, bad };
 }
 </script>
 
 <template>
-  <div v-if="loading" class="empty">Yukleniyor</div>
-  <div v-else-if="!post" class="empty"><div class="h2">Yazi bulunamadi</div></div>
+  <div v-if="loading" class="empty">Yükleniyor…</div>
+  <div v-else-if="!post" class="empty"><div class="h2">Yazı bulunamadı</div></div>
 
   <div v-else>
-    <RouterLink to="/" class="back">&#8592; Tum yazilar</RouterLink>
+    <RouterLink to="/" class="back">&#8592; Tüm yazılar</RouterLink>
 
     <!-- ───────── kontrol paneli ───────── -->
     <section class="panel rise">
@@ -167,13 +179,13 @@ function catStat(cat) {
         <input
           class="title-input"
           :value="post.title"
-          aria-label="Yazi basligi"
+          aria-label="Yazı başlığı"
           @input="savePost({ title: $event.target.value })"
         />
 
         <div class="fields">
           <div class="field grow">
-            <label for="cp-url">Denetlenecek URL</label>
+            <label for="cp-url">Denetlenecek adres</label>
             <input
               id="cp-url" class="input mono" placeholder="https://site.com/yazi-adresi/"
               :value="post.url || ''"
@@ -198,13 +210,13 @@ function catStat(cat) {
 
         <div class="actions">
           <button class="btn btn-primary" :disabled="auditing || !post.url" @click="runAudit">
-            {{ auditing ? 'Denetleniyor' : 'Kontrol Et' }}
+            {{ auditing ? 'Denetleniyor…' : 'Kontrol Et' }}
             <span class="btn-arrow" aria-hidden="true">&#8594;</span>
           </button>
           <span class="saved">
-            <template v-if="saving">kaydediliyor</template>
+            <template v-if="saving">kaydediliyor…</template>
             <template v-else-if="audit?.created_at">son denetim {{ String(audit.created_at).slice(0, 16) }}</template>
-            <template v-else>henuz denetlenmedi</template>
+            <template v-else>henüz denetlenmedi</template>
           </span>
         </div>
       </div>
@@ -219,8 +231,8 @@ function catStat(cat) {
           </div>
         </div>
         <ul class="tallies">
-          <li><i class="d d-pass"></i>{{ summary.pass }} gecti</li>
-          <li><i class="d d-warn"></i>{{ summary.warn }} uyari</li>
+          <li><i class="d d-pass"></i>{{ summary.pass }} geçti</li>
+          <li><i class="d d-warn"></i>{{ summary.warn }} uyarı</li>
           <li><i class="d d-fail"></i>{{ summary.fail }} hata</li>
           <li><i class="d d-wait"></i>{{ summary.manual + summary.pending }} bekliyor</li>
         </ul>
@@ -229,51 +241,57 @@ function catStat(cat) {
 
     <p v-if="error" class="notice">{{ error }}</p>
 
-    <!-- ───────── yayin kapisi ───────── -->
+    <!-- ───────── yayın kapısı ───────── -->
     <section class="gate" :class="ready ? 'gate-ok' : 'gate-block'">
       <div class="gate-tag">
-        <span class="gate-led"></span>{{ ready ? 'Yayina hazir' : 'Yayinlama' }}
+        <span class="gate-led"></span>{{ ready ? 'Yayına hazır' : 'Yayınlama' }}
       </div>
       <div class="gate-body">
         <template v-if="ready">
-          <p class="gate-lead">Kritik maddelerin tamami temiz. Yayinlayabilirsin.</p>
+          <p class="gate-lead">Kritik maddelerin tamamı temiz. Yayınlayabilirsin.</p>
         </template>
         <template v-else-if="!audit">
-          <p class="gate-lead">Once <strong>Kontrol Et</strong>&#8217;e bas. Denetim calistirilmadan yayin onayi verilmez.</p>
+          <p class="gate-lead">Önce <strong>Kontrol Et</strong>&#8217;e bas. Denetim çalıştırılmadan yayın onayı verilmez.</p>
         </template>
         <template v-else>
-          <p class="gate-lead"><strong>{{ blockers.length }} kritik madde acik.</strong> Bunlar kapanmadan yayinlama.</p>
+          <p class="gate-lead"><strong>{{ blockers.length }} kritik madde açık.</strong> Bunlar kapanmadan yayınlama.</p>
           <ul class="gate-list">
             <li v-for="b in blockers" :key="b.code">
               <span class="mono gcode">{{ b.code }}</span>
               <span class="glabel">{{ b.label }}</span>
               <span v-if="findings[b.code]?.message" class="gwhy">{{ findings[b.code].message }}</span>
-              <span v-else-if="b.mode === 'manual'" class="gwhy">kontrol edip isaretlemedin</span>
+              <span v-else-if="b.mode === 'manual'" class="gwhy">kontrol edip işaretlemedin</span>
             </li>
           </ul>
         </template>
       </div>
     </section>
 
-    <!-- ───────── filtre ───────── -->
+    <!-- ───────── süzgeç ───────── -->
     <div class="filters">
       <button class="pill" :class="{ on: showOnly === 'all' }" @click="showOnly = 'all'">
-        Tumu <span>{{ items.length }}</span>
+        Tümü <span>{{ items.length }}</span>
       </button>
-      <button class="pill" :class="{ on: showOnly === 'problems' }" @click="showOnly = 'problems'">
+      <button class="pill pill-problems" :class="{ on: showOnly === 'problems' }" @click="showOnly = 'problems'">
         Sorunlular <span>{{ summary.fail + summary.warn }}</span>
       </button>
-      <button class="pill" :class="{ on: showOnly === 'manual' }" @click="showOnly = 'manual'">
-        Elle isaretlenecek <span>{{ summary.manual }}</span>
+      <button class="pill pill-manual" :class="{ on: showOnly === 'manual' }" @click="showOnly = 'manual'">
+        Elle işaretlenecek <span>{{ summary.manual }}</span>
       </button>
     </div>
 
-    <!-- ───────── liste ───────── -->
-    <div v-if="!grouped.length" class="empty"><div class="h2">Bu filtrede madde yok</div></div>
+    <!-- ───────── madde listesi ───────── -->
+    <div v-if="!grouped.length" class="empty"><div class="h2">Bu süzgeçte madde yok</div></div>
 
-    <section v-for="(cat, ci) in grouped" :key="cat.key" class="cat rise" :style="{ animationDelay: ci * 45 + 'ms' }">
+    <section
+      v-for="(cat, ci) in grouped"
+      :key="cat.key"
+      class="cat rise"
+      :class="'cat-' + cat.key"
+      :style="{ animationDelay: ci * 45 + 'ms' }"
+    >
       <header class="cat-head">
-        <h2 class="h3"><span class="cat-icon">{{ cat.icon }}</span>{{ cat.label }}</h2>
+        <h2 class="h3"><span class="cat-chip">{{ cat.icon }}</span>{{ cat.label }}</h2>
         <div class="cat-stat">
           <span class="cat-count">{{ catStat(cat).done }}/{{ catStat(cat).total }}</span>
           <span v-if="catStat(cat).bad" class="cat-bad">{{ catStat(cat).bad }} hata</span>
@@ -293,7 +311,7 @@ function catStat(cat) {
     </section>
 
     <p v-if="lastRun && !lastRun.ai.used" class="ai-note">
-      Yapay zeka degerlendirmesi calismadi &mdash; {{ lastRun.ai.reason }}
+      Yapay zekâ değerlendirmesi çalışmadı &mdash; {{ lastRun.ai.reason }}
     </p>
   </div>
 </template>
@@ -308,11 +326,16 @@ function catStat(cat) {
 
 /* ───── kontrol paneli ───── */
 .panel {
+  position: relative; overflow: hidden;
   display: flex; gap: 40px;
   padding: 30px 32px;
   border: 1px solid var(--line);
   border-radius: var(--r-card);
   margin-bottom: 26px;
+}
+.panel::before {
+  content: ''; position: absolute; inset: 0 0 auto 0; height: 3px;
+  background: linear-gradient(90deg, var(--c-url), var(--c-title), var(--c-content), var(--c-publish));
 }
 .panel-main { flex: 1; min-width: 0; }
 
@@ -418,6 +441,11 @@ function catStat(cat) {
 .pill:hover { border-color: var(--ink); color: var(--ink); }
 .pill.on { background: var(--dark); border-color: var(--dark); color: #fff; }
 .pill.on span { color: rgba(255, 255, 255, 0.55); }
+/* Sorunlu ve bekleyen süzgeçleri kendi anlam renklerini taşır */
+.pill-problems:not(.on) { border-color: var(--fail-line); background: var(--fail-soft); color: var(--fail); }
+.pill-problems:not(.on) span { color: var(--fail); opacity: 0.7; }
+.pill-manual:not(.on) { border-color: var(--info-line); background: var(--info-soft); color: var(--info); }
+.pill-manual:not(.on) span { color: var(--info); opacity: 0.7; }
 
 /* ───── kategoriler ───── */
 .cat { margin-bottom: 34px; }
@@ -425,10 +453,10 @@ function catStat(cat) {
   display: flex; align-items: center; justify-content: space-between; gap: 18px;
   margin-bottom: 14px;
 }
-.cat-head .h3 { display: flex; align-items: center; gap: 11px; }
-.cat-icon { font-size: 17px; }
+.cat-head .h3 { display: flex; align-items: center; gap: 12px; }
+
 .cat-stat { display: flex; align-items: center; gap: 10px; font-size: 12.5px; }
-.cat-count { color: var(--muted); }
+.cat-count { color: var(--c, var(--muted)); font-weight: 500; }
 .cat-bad {
   padding: 3px 11px; border-radius: var(--r-pill);
   background: var(--fail-soft); border: 1px solid var(--fail-line); color: var(--fail);
@@ -436,7 +464,10 @@ function catStat(cat) {
 }
 .cat-items {
   list-style: none; margin: 0; padding: 0;
-  border: 1px solid var(--line); border-radius: var(--r-card);
+  border: 1px solid var(--line);
+  /* Kategorinin kimlik rengi kartın üstünde şerit olarak durur. */
+  border-top: 3px solid var(--c, var(--accent));
+  border-radius: var(--r-card);
   overflow: hidden;
 }
 

@@ -2,9 +2,9 @@
 import { ref, computed } from 'vue';
 
 const props = defineProps({
-  item:    { type: Object, required: true },   // checklist_items satiri
+  item:    { type: Object, required: true },   // checklist_items satırı
   finding: { type: Object, default: null },    // son denetimin bu maddeye dair bulgusu
-  check:   { type: Object, default: null },    // editorun elle isareti
+  check:   { type: Object, default: null },    // editörün elle işareti
   busy:    { type: Boolean, default: false },
 });
 const emit = defineEmits(['toggle']);
@@ -14,7 +14,7 @@ const open = ref(false);
 const isManual = computed(() => props.item.mode === 'manual');
 const isChecked = computed(() => !!props.check?.is_checked);
 
-/** Otomatik maddelerde karar denetimden gelir; manuel maddelerde editorden. */
+/** Otomatik maddelerde karar denetimden gelir; elle işaretlenenlerde editörden. */
 const status = computed(() => {
   if (isManual.value) return isChecked.value ? 'pass' : 'manual';
   if (!props.finding) return 'pending';
@@ -22,11 +22,11 @@ const status = computed(() => {
 });
 
 const STATUS_TEXT = {
-  pass: 'Gecti', warn: 'Uyari', fail: 'Hata',
-  skip: 'Atlandi', manual: 'Sende', pending: 'Denetlenmedi',
+  pass: 'Geçti', warn: 'Uyarı', fail: 'Hata',
+  skip: 'Atlandı', manual: 'Sende', pending: 'Denetlenmedi',
 };
-const SEVERITY_TEXT = { critical: 'Kritik', high: 'Onemli', medium: 'Orta' };
-const MODE_TEXT = { rule: 'otomatik olculur', ai: 'yapay zeka degerlendirir', manual: 'elle isaretlenir' };
+const SEVERITY_TEXT = { critical: 'Kritik', high: 'Önemli', medium: 'Orta' };
+const MODE_TEXT = { rule: 'otomatik ölçülür', ai: 'yapay zekâ değerlendirir', manual: 'elle işaretlenir' };
 
 const badgeClass = computed(() =>
   status.value === 'pending' ? 'badge-skip' : `badge-${status.value}`
@@ -40,8 +40,8 @@ const isBlocker = computed(
 <template>
   <li class="item" :class="{ blocker: isBlocker, done: status === 'pass' }">
     <div class="item-head">
-      <!-- Kontrol: yalnizca elle isaretlenen maddelerde kutucuk cikar.
-           Makinenin olcebildigi maddede editor 'yaptim' diyemez. -->
+      <!-- Kutucuk yalnızca elle işaretlenen maddelerde çıkar.
+           Makinenin ölçebildiği maddede editör "yaptım" diyemez. -->
       <div class="control">
         <label v-if="isManual" class="chk" :class="{ on: isChecked }">
           <input
@@ -68,13 +68,13 @@ const isBlocker = computed(
 
       <div class="right">
         <span class="badge" :class="badgeClass">{{ STATUS_TEXT[status] }}</span>
-        <button class="chev" type="button" :aria-label="open ? 'Kapat' : 'Ayrintiyi ac'" @click="open = !open">
+        <button class="chev" type="button" :aria-label="open ? 'Kapat' : 'Ayrıntıyı aç'" @click="open = !open">
           <span :class="{ flip: open }">&#9662;</span>
         </button>
       </div>
     </div>
 
-    <!-- denetim mesaji her zaman gorunur: en degerli bilgi bu -->
+    <!-- Denetim mesajı açmadan da görünür: en değerli bilgi bu. -->
     <p v-if="finding?.message && status !== 'pass'" class="verdict" :class="'v-' + status">
       {{ finding.message }}
     </p>
@@ -83,11 +83,11 @@ const isBlocker = computed(
       <div v-if="open" class="detail">
         <div class="detail-grid">
           <div>
-            <div class="eyebrow bare">Neden onemli</div>
+            <div class="eyebrow bare">Neden önemli</div>
             <p>{{ item.why }}</p>
           </div>
           <div>
-            <div class="eyebrow bare">Nasil yapilir</div>
+            <div class="eyebrow bare">Nasıl yapılır</div>
             <p>{{ item.how }}</p>
           </div>
         </div>
@@ -95,18 +95,18 @@ const isBlocker = computed(
         <div v-if="finding?.message" class="detail-block">
           <div class="eyebrow bare">
             Denetim sonucu
-            <span class="src">{{ finding.source === 'ai' ? 'yapay zeka' : 'kural motoru' }}</span>
+            <span class="src">{{ finding.source === 'ai' ? 'yapay zekâ' : 'kural motoru' }}</span>
           </div>
           <p>{{ finding.message }}</p>
         </div>
 
         <div v-if="finding?.evidence" class="detail-block">
-          <div class="eyebrow bare">Sayfadaki kanit</div>
+          <div class="eyebrow bare">Sayfadaki kanıt</div>
           <pre class="evidence mono">{{ finding.evidence }}</pre>
         </div>
 
         <div v-if="check?.checked_by" class="detail-block signoff">
-          {{ check.checked_by }} tarafindan isaretlendi &middot; {{ String(check.checked_at || '').slice(0, 16) }}
+          {{ check.checked_by }} işaretledi &middot; {{ String(check.checked_at || '').slice(0, 16) }}
           <template v-if="check.note"> &middot; &ldquo;{{ check.note }}&rdquo;</template>
         </div>
       </div>
@@ -132,7 +132,7 @@ const isBlocker = computed(
 
 .control { flex: none; width: 20px; display: grid; place-items: center; padding-top: 2px; }
 
-/* Elle isaretleme kutusu */
+/* Elle işaretleme kutusu */
 .chk { position: relative; display: grid; place-items: center; cursor: pointer; }
 .chk input { position: absolute; inset: 0; opacity: 0; width: 20px; height: 20px; margin: 0; cursor: pointer; }
 .tick {

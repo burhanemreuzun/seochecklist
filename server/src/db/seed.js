@@ -1,7 +1,7 @@
 /**
- * checklist.seed.js icindeki madde tanimlarini veritabanina yazar.
- * Var olan maddeleri gunceller, listeden cikarilanlari pasife ceker (silmez -
- * eski denetim kayitlari onlara bagli).
+ * checklist.seed.js içindeki madde tanımlarını veritabanına yazar.
+ * Var olan maddeleri günceller, listeden çıkarılanları pasife çeker; silmez,
+ * çünkü eski denetim kayıtları onlara bağlıdır.
  *   npm run db:seed
  */
 require('dotenv').config({ quiet: true, path: require('path').join(__dirname, '../../../.env') });
@@ -44,11 +44,11 @@ const { CATEGORIES, ITEMS } = require('./checklist.seed');
     );
 
     await conn.commit();
-    console.log(`✔ ${CATEGORIES.length} kategori, ${ITEMS.length} madde yazildi.`);
-    if (res.affectedRows) console.log(`  (${res.affectedRows} eski madde pasife alindi)`);
+    console.log(`✔ ${CATEGORIES.length} kategori, ${ITEMS.length} madde yazıldı.`);
+    if (res.affectedRows) console.log(`  ${res.affectedRows} eski madde pasife alındı.`);
   } catch (err) {
     await conn.rollback();
-    console.error('✖ Seed hatasi:', err.message);
+    console.error('✖ Madde yükleme hatası:', err.message);
     process.exitCode = 1;
   } finally {
     conn.release();

@@ -1,211 +1,211 @@
 # SEO Kontrol Listesi
 
-58 madde · 9 baslik altinda.
-Bu dosya `server/src/db/checklist.seed.js` dosyasindan uretilir - elle duzenleme.
+58 madde, 9 başlık altında.
+Bu dosya `server/src/db/checklist.seed.js` dosyasından üretilir; elle düzenleme.
 
-| Isaret | Anlami |
+| İşaret | Anlamı |
 | --- | --- |
-| `otomatik` | Kural motoru olcer, editor isaretleyemez. |
-| `yapay zeka` | Gemini degerlendirir, editor isaretleyemez. |
-| `elle` | Editorun kontrol edip isaretlemesi gerekir. |
+| `otomatik` | Kural motoru ölçer, editör işaretleyemez. |
+| `yapay zekâ` | Gemini değerlendirir, editör işaretleyemez. |
+| `elle` | Editörün kontrol edip işaretlemesi gerekir. |
 
-## 🔗 URL & Slug
+## 🔗 URL ve Kalıcı Bağlantı
 
-- [ ] **URL_01** · `KRITIK` · `otomatik` — Slug 3-5 kelime ve odak anahtar kelimeyi iceriyor
-  - *Neden:* URL, Google'in sayfayi siniflandirirken okudugu ilk sinyaldir. Kisa ve anahtar kelimeli URL hem siralamaya hem tiklama oranina yardim eder.
-  - *Nasil:* WordPress duzenleyicide sag panelden "Kalici Baglanti" alanini ac, otomatik uretilen uzun slug'i sil, 3-5 kelimeye indir.
-- [ ] **URL_02** · `KRITIK` · `otomatik` — Slug'da Turkce karakter, buyuk harf, alt cizgi veya tarih yok
-  - *Neden:* Turkce karakterler URL'de yuzde isaretli kodlara donusur (%C4%B1) ve linki okunmaz yapar. Alt cizgi Google tarafindan kelime ayirici sayilmaz.
-  - *Nasil:* Sadece kucuk harf, rakam ve tire kullan. "ç→c, ğ→g, ı→i, ö→o, ş→s, ü→u" donusumunu elle yap.
-- [ ] **URL_03** · `Orta` · `otomatik` — Slug'da gereksiz baglac / dolgu kelime yok
-  - *Neden:* "ve, ile, icin, bir, nasil" gibi kelimeler URL'ye anlam katmaz, sadece uzatir.
-  - *Nasil:* Slug'i yazdiktan sonra tek tek oku: cikardiginda anlam bozulmuyorsa cikar.
-- [ ] **URL_04** · `KRITIK` · `elle` — Yayindaki bir yazinin URL'i degistirilmedi; degistiyse 301 yonlendirme kuruldu
-  - *Neden:* URL degisince eski adres 404 verir; o adrese gelen tum baglantilar ve siralama degeri yok olur.
-  - *Nasil:* Zorunlu degilse URL'e dokunma. Degistirmen gerekiyorsa Redirection eklentisinden eski URL → yeni URL 301 kaydi ac.
+- [ ] **URL_01** · `KRİTİK` · `otomatik` — Kalıcı bağlantı 3-5 kelime ve odak anahtar kelimeyi içeriyor
+  - *Neden önemli:* URL, Google'ın sayfayı sınıflandırırken okuduğu ilk sinyaldir. Kısa ve anahtar kelimeli bir adres hem sıralamaya hem tıklanma oranına yardım eder; uzun adres arama sonucunda kırpılır.
+  - *Nasıl yapılır:* Düzenleyicide sağ panelden "Kalıcı Bağlantı" alanını aç, WordPress'in başlıktan ürettiği uzun adresi sil, 3-5 kelimeye indir.
+- [ ] **URL_02** · `KRİTİK` · `otomatik` — Adres temiz: Türkçe karakter, büyük harf, alt çizgi ve tarih yok
+  - *Neden önemli:* Türkçe karakterler adreste yüzde işaretli kodlara dönüşür (ı → %C4%B1) ve bağlantıyı okunmaz yapar. Alt çizgi Google tarafından kelime ayırıcı sayılmaz, tire sayılır.
+  - *Nasıl yapılır:* Yalnızca küçük harf, rakam ve tire kullan. Dönüşümü elle yap: ç→c, ğ→g, ı→i, ö→o, ş→s, ü→u.
+- [ ] **URL_03** · `Orta` · `otomatik` — Adreste gereksiz bağlaç veya dolgu kelime yok
+  - *Neden önemli:* "ve, ile, için, bir, bu" gibi kelimeler adrese anlam katmaz, yalnızca uzatır.
+  - *Nasıl yapılır:* Adresi yazdıktan sonra kelimeleri tek tek oku: çıkardığında anlam bozulmuyorsa çıkar.
+- [ ] **URL_04** · `KRİTİK` · `elle` — Yayındaki bir yazının adresi değiştirilmedi; değiştiyse 301 yönlendirme kuruldu
+  - *Neden önemli:* Adres değişince eski sayfa 404 verir. O adrese verilmiş tüm bağlantılar ve birikmiş sıralama değeri bir anda yok olur.
+  - *Nasıl yapılır:* Zorunlu değilse adrese dokunma. Değiştirmen gerekiyorsa Redirection eklentisinden eski adres → yeni adres için 301 kaydı aç.
 
-## 🏷️ Baslik & SEO Basligi
+## 🏷️ Başlık ve SEO Başlığı
 
-- [ ] **TTL_01** · `KRITIK` · `otomatik` — SEO basligi 50-60 karakter arasinda
-  - *Neden:* Google arama sonucunda basligi yaklasik 580 piksel genisliginde keser. Uzun baslik "..." ile kirpilir, mesaj yarim kalir.
-  - *Nasil:* Yoast/Rank Math kutusunda "SEO Basligi" alanini kullan. Sayaci yesil bandin icinde tut.
-- [ ] **TTL_02** · `KRITIK` · `otomatik` — Odak anahtar kelime baslikta, tercihen ilk 30 karakterde
-  - *Neden:* Basligin basindaki kelimelere Google ve kullanici daha fazla agirlik verir.
-  - *Nasil:* Baslik kalibi: "[Odak Kelime] + fayda/ayirt edici bilgi". Ornek: "Kombi Basinci Nasil Ayarlanir? 4 Adimda Cozum".
-- [ ] **TTL_03** · `Onemli` · `otomatik` — SEO basligi ile sayfadaki H1 birebir ayni degil
-  - *Neden:* SEO basligi aramada tiklatmak, H1 ise sayfaya giren okuyucuyu karsilamak icindir. Iki farkli is, iki farkli metin.
-  - *Nasil:* H1'i (yazi basligi) daha dogal ve uzun yaz, SEO basligini kisalt ve arama odakli kur.
-- [ ] **TTL_04** · `Onemli` · `elle` — Baslik site genelinde benzersiz, ayni basligi tasiyan baska yazi yok
-  - *Neden:* Ayni/benzer basliklar birbiriyle yaristigi icin ikisi de siralamada geriler (keyword cannibalization).
-  - *Nasil:* Yayinlamadan once Google'da: site:siteadi.com "baslik metni" diye ara. Sonuc cikiyorsa basligi farklilastir.
-- [ ] **TTL_05** · `Orta` · `otomatik` — Baslikta tamami buyuk harf, cok sayida unlem/soru isareti yok
-  - *Neden:* Google bu tur basliklari kendi yeniden yazar; yazdigin baslik gosterilmez.
-  - *Nasil:* Sadece ilk harfleri buyuk yaz. En fazla tek "?" veya tek "!" kullan.
-- [ ] **TTL_06** · `Orta` · `otomatik` — Marka adi kullanildiysa yalnizca sonda ve ayirici ile
-  - *Neden:* Marka adi basta yer kaplar ve degerli ilk karakterleri harcar.
-  - *Nasil:* Kalip: "Icerik Basligi | Marka". Bu genelde temada otomatiktir; elle tekrar ekleme.
-- [ ] **TTL_07** · `Orta` · `otomatik` — Baslikta yil geciyorsa guncel yil kullanilmis
-  - *Neden:* Eski yil iceren baslik ("... 2021") kullaniciya icerigin bayat oldugunu soyler, tiklama oranini dusurur.
-  - *Nasil:* Yil yazacaksan icerigi de gercekten guncelle. Guncellemiyorsan yili basliktan cikar.
+- [ ] **TTL_01** · `KRİTİK` · `otomatik` — SEO başlığı 50-60 karakter arasında
+  - *Neden önemli:* Google arama sonucundaki başlığı yaklaşık 580 piksel genişliğinde keser. Uzun başlık üç noktayla kırpılır ve mesajın can alıcı kısmı görünmez.
+  - *Nasıl yapılır:* Yoast veya Rank Math kutusundaki "SEO Başlığı" alanını kullan; sayacı yeşil bandın içinde tut.
+- [ ] **TTL_02** · `KRİTİK` · `otomatik` — Odak anahtar kelime başlıkta, tercihen ilk 30 karakterde
+  - *Neden önemli:* Başlığın başındaki kelimelere hem Google hem de sonuçları göz gezdiren kullanıcı daha fazla ağırlık verir.
+  - *Nasıl yapılır:* Başlık kalıbı: "[Odak Kelime] + ayırt edici fayda". Örnek: "Kombi Basıncı Nasıl Ayarlanır? 4 Adımda Çözüm".
+- [ ] **TTL_03** · `Önemli` · `otomatik` — SEO başlığı ile sayfadaki H1 birebir aynı değil
+  - *Neden önemli:* SEO başlığının işi arama sonucunda tıklatmak, H1'in işi sayfaya giren okuyucuyu karşılamaktır. İki farklı iş, iki farklı metin ister.
+  - *Nasıl yapılır:* H1'i (yazı başlığını) daha doğal ve uzun yaz; SEO başlığını kısalt ve arama odaklı kur.
+- [ ] **TTL_04** · `Önemli` · `elle` — Başlık site genelinde benzersiz, aynı başlığı taşıyan başka yazı yok
+  - *Neden önemli:* Aynı ya da çok benzer başlıklı iki yazı birbiriyle yarışır ve ikisi de sıralamada geriler. Buna anahtar kelime yamyamlığı denir.
+  - *Nasıl yapılır:* Yayınlamadan önce Google'da şöyle ara: site:siteadi.com "başlık metni". Sonuç çıkıyorsa başlığı farklılaştır.
+- [ ] **TTL_05** · `Orta` · `otomatik` — Başlıkta tamamı büyük harf veya çok sayıda ünlem/soru işareti yok
+  - *Neden önemli:* Google bu tür başlıkları güvenilmez bulup kendi yeniden yazar; senin yazdığın başlık hiç gösterilmez.
+  - *Nasıl yapılır:* Yalnızca kelime başlarını büyük yaz. En fazla tek "?" ya da tek "!" kullan.
+- [ ] **TTL_06** · `Orta` · `otomatik` — Marka adı kullanıldıysa yalnızca sonda ve ayırıcı ile
+  - *Neden önemli:* Başa konan marka adı, başlığın en değerli ilk karakterlerini harcar ve her yazıda aynı şeyi tekrarlar.
+  - *Nasıl yapılır:* Kalıp: "İçerik Başlığı | Marka". Bu genelde temada otomatiktir, elle bir daha ekleme.
+- [ ] **TTL_07** · `Orta` · `otomatik` — Başlıkta yıl geçiyorsa güncel yıl kullanılmış
+  - *Neden önemli:* Eski yıl içeren bir başlık kullanıcıya içeriğin bayat olduğunu söyler ve tıklanma oranını düşürür.
+  - *Nasıl yapılır:* Yıl yazacaksan içeriği de gerçekten güncelle. Güncellemiyorsan yılı başlıktan çıkar.
 
-## 📝 Meta Aciklama
+## 📝 Meta Açıklama
 
-- [ ] **MTA_01** · `KRITIK` · `otomatik` — Meta aciklama elle yazildi (bos birakilip otomatik uretilmedi)
-  - *Neden:* Bos birakirsan Google sayfadan rastgele bir cumle ceker; genelde menu veya alakasiz bir paragraf olur.
-  - *Nasil:* Yoast/Rank Math kutusunda "Meta Aciklama" alanini doldur. Sablon degiskeni degil, duz metin yaz.
-- [ ] **MTA_02** · `Onemli` · `otomatik` — Meta aciklama 120-158 karakter
-  - *Neden:* 120 karakterin altinda alan bosa gider, 158 ustunde metin kesilir.
-  - *Nasil:* Sayaci takip et. Cumleyi 158'de degil, anlamli bir noktada bitir.
-- [ ] **MTA_03** · `Onemli` · `otomatik` — Odak anahtar kelime meta aciklamada dogal bicimde geciyor
-  - *Neden:* Aranan kelime aciklamada kalin gosterilir, gozle taranan sonuc sayfasinda dikkat ceker.
-  - *Nasil:* Kelimeyi cumlenin icine yedir; basa yapistirmak yerine akici kullan.
-- [ ] **MTA_04** · `Orta` · `yapay zeka` — Meta aciklama net bir fayda vaadi veya aksiyon cagrisi iceriyor
-  - *Neden:* Aciklama bir reklam metnidir; ne kazanacagini soylemezse kullanici alttaki sonuca tiklar.
-  - *Nasil:* "Ogren, hesapla, adim adim, ucretsiz sablon" gibi somut bir vaat ekle.
-- [ ] **MTA_05** · `Orta` · `yapay zeka` — Meta aciklama, ilk paragrafin kopyala-yapistiri degil
-  - *Neden:* Ayni metnin iki kez gorunmesi hem tekrar hissi verir hem de aciklamanin ikna gucunu harcar.
-  - *Nasil:* Aciklamayi icerigi yazdiktan sonra, ozet olarak sifirdan yaz.
-- [ ] **MTA_06** · `Orta` · `elle` — Meta aciklama baska bir yazininkiyle ayni degil
-  - *Neden:* Tekrar eden aciklamalar Search Console'da "yinelenen meta aciklama" uyarisi uretir.
-  - *Nasil:* Benzer konulu eski yaziyi ac, aciklamasini karsilastir.
+- [ ] **MTA_01** · `KRİTİK` · `otomatik` — Meta açıklama elle yazıldı (boş bırakılıp otomatik üretilmedi)
+  - *Neden önemli:* Boş bırakırsan Google sayfadan rastgele bir cümle çeker. Genelde menü metni ya da konuyla ilgisiz bir paragraf olur.
+  - *Nasıl yapılır:* Yoast veya Rank Math kutusundaki "Meta Açıklama" alanını doldur. Şablon değişkeni değil, düz metin yaz.
+- [ ] **MTA_02** · `Önemli` · `otomatik` — Meta açıklama 120-158 karakter
+  - *Neden önemli:* 120 karakterin altında sana ayrılan alan boşa gider; 158 karakterin üstünde metin ortadan kesilir.
+  - *Nasıl yapılır:* Sayacı takip et ve cümleyi 158'de değil, anlamlı bir yerde bitir.
+- [ ] **MTA_03** · `Önemli` · `otomatik` — Odak anahtar kelime meta açıklamada doğal biçimde geçiyor
+  - *Neden önemli:* Aranan kelime açıklamada kalın gösterilir. Göz gezdirilen sonuç sayfasında bu kalınlık dikkat çeker.
+  - *Nasıl yapılır:* Kelimeyi cümlenin içine yedir; başa yapıştırmak yerine akıcı biçimde kullan.
+- [ ] **MTA_04** · `Orta` · `yapay zekâ` — Meta açıklama net bir fayda vaadi veya eylem çağrısı içeriyor
+  - *Neden önemli:* Açıklama aslında bir reklam metnidir. Okuyucuya ne kazanacağını söylemezse alttaki sonuca tıklanır.
+  - *Nasıl yapılır:* "Öğren, hesapla, adım adım, ücretsiz şablon" gibi somut bir vaat ekle.
+- [ ] **MTA_05** · `Orta` · `yapay zekâ` — Meta açıklama, ilk paragrafın kopyala-yapıştırı değil
+  - *Neden önemli:* Aynı metnin hem sonuçta hem sayfada görünmesi tekrar hissi verir ve açıklamanın ikna gücünü harcar.
+  - *Nasıl yapılır:* Açıklamayı içeriği yazdıktan sonra, bir özet olarak sıfırdan yaz.
+- [ ] **MTA_06** · `Orta` · `elle` — Meta açıklama başka bir yazınınkiyle aynı değil
+  - *Neden önemli:* Tekrar eden açıklamalar Search Console'da "yinelenen meta açıklama" uyarısı üretir.
+  - *Nasıl yapılır:* Benzer konulu eski yazıyı aç ve açıklamasını bununla karşılaştır.
 
-## 🪜 Baslik Hiyerarsisi
+## 🪜 Başlık Hiyerarşisi
 
-- [ ] **HDG_01** · `KRITIK` · `otomatik` — Sayfada tam olarak 1 adet H1 var
-  - *Neden:* H1 sayfanin ana konusudur. Sifir tane olursa konu belirsiz kalir, birden fazla olursa sinyal boluner.
-  - *Nasil:* Yazi basligi zaten H1'dir. Icerik icinde blok eklerken "Baslik 1"i ASLA secme, H2'den basla.
-- [ ] **HDG_02** · `Onemli` · `otomatik` — H1 yazinin konusunu anlatiyor; site adi/logo H1 degil
-  - *Neden:* Her sayfada ayni H1 (site adi) varsa hicbir sayfanin kendine ait konusu olmaz.
-  - *Nasil:* Bu genelde tema hatasidir. H1 site adiysa temayi duzelttir, kendi basina cozme.
-- [ ] **HDG_03** · `KRITIK` · `otomatik` — Basliklarda seviye atlanmamis (H2'den sonra H4'e gecilmemis)
-  - *Neden:* Heading yapisi bir icindekiler agacidir. Seviye atlamak, kirik bir icindekiler tablosu demektir; ekran okuyucular da yolunu kaybeder.
-  - *Nasil:* Sirasi: H2 → altinda H3 → onun altinda H4. Bir ust basliga donmek serbest, ileri atlamak degil.
-- [ ] **HDG_04** · `Onemli` · `yapay zeka` — Heading'ler sadece buyuk/kalin gostermek icin kullanilmamis
-  - *Neden:* Heading anlam etiketidir, yazi tipi ayari degil. Vurgu icin kullanilan H3'ler icerik yapisini bozar.
-  - *Nasil:* Metni buyuk gostermek istiyorsan kalin (bold) kullan. Heading'i sadece yeni bir bolum baslatirken kullan.
-- [ ] **HDG_05** · `Onemli` · `otomatik` — En az 2 adet H2 var ve her H2 altinda gercek icerik var
-  - *Neden:* Alt basliksiz uzun metin okunmaz; ayrica Google alt basliklari one cikan snippet secerken kullanir.
-  - *Nasil:* Her 200-300 kelimede bir H2 ac. Bos baslik birakma.
-- [ ] **HDG_06** · `Orta` · `yapay zeka` — Alt basliklar anlamli; "Giris / Sonuc / Genel" gibi bos basliklar yok
-  - *Neden:* Alt basliklar uzun kuyruk aramalari yakalar. "Sonuc" hicbir arama yapmaz.
-  - *Nasil:* Alt basligi kullanicinin arayacagi soruya cevir: "Sonuc" yerine "Hangi Yontem Daha Ucuz?".
-- [ ] **HDG_07** · `Orta` · `otomatik` — Bos heading yok, heading icinde gorsel/buton yok
-  - *Neden:* Bos veya gorsel iceren heading, icindekiler tablosunda bos satir olarak cikar.
-  - *Nasil:* Yaziyi bitirince heading listesine ust gecis yap, bos olanlari sil.
+- [ ] **HDG_01** · `KRİTİK` · `otomatik` — Sayfada tam olarak 1 adet H1 var
+  - *Neden önemli:* H1 sayfanın ana konusudur. Hiç yoksa konu belirsiz kalır, birden fazlaysa sinyal bölünür.
+  - *Nasıl yapılır:* Yazı başlığı zaten H1'dir. İçeriğe blok eklerken "Başlık 1"i asla seçme, H2'den başla.
+- [ ] **HDG_02** · `Önemli` · `otomatik` — H1 yazının konusunu anlatıyor; site adı veya logo H1 değil
+  - *Neden önemli:* Her sayfada aynı H1 (site adı) varsa hiçbir sayfanın kendine ait bir konusu olmaz.
+  - *Nasıl yapılır:* Bu genellikle tema hatasıdır. H1 site adıysa temayı düzelttir, yazı içinden çözmeye çalışma.
+- [ ] **HDG_03** · `KRİTİK` · `otomatik` — Başlıklarda seviye atlanmamış (H2'den sonra H4'e geçilmemiş)
+  - *Neden önemli:* Başlık yapısı bir içindekiler ağacıdır. Seviye atlamak kırık bir içindekiler tablosu demektir; ekran okuyucu kullananlar da yolunu kaybeder.
+  - *Nasıl yapılır:* Sıra şöyle: H2 → altında H3 → onun altında H4. Bir üst başlığa dönmek serbest, ileri atlamak değil.
+- [ ] **HDG_04** · `Önemli` · `yapay zekâ` — Başlıklar yalnızca büyük veya kalın göstermek için kullanılmamış
+  - *Neden önemli:* Başlık bir anlam etiketidir, yazı tipi ayarı değil. Vurgu amaçlı açılan H3'ler içeriğin yapısını bozar.
+  - *Nasıl yapılır:* Metni öne çıkarmak istiyorsan kalın kullan. Başlığı yalnızca yeni bir bölüm başlatırken aç.
+- [ ] **HDG_05** · `Önemli` · `otomatik` — En az 2 adet H2 var ve her H2 altında gerçek içerik var
+  - *Neden önemli:* Alt başlıksız uzun metin okunmaz. Google ayrıca öne çıkan snippet seçerken alt başlıkları kullanır.
+  - *Nasıl yapılır:* Her 200-300 kelimede bir H2 aç ve altını boş bırakma.
+- [ ] **HDG_06** · `Orta` · `yapay zekâ` — Alt başlıklar anlamlı; "Giriş, Sonuç, Genel" gibi boş başlıklar yok
+  - *Neden önemli:* Alt başlıklar uzun kuyruk aramalarını yakalar. "Sonuç" kelimesini kimse aramaz.
+  - *Nasıl yapılır:* Alt başlığı kullanıcının soracağı soruya çevir: "Sonuç" yerine "Hangi Yöntem Daha Ucuz?".
+- [ ] **HDG_07** · `Orta` · `otomatik` — Boş başlık yok, başlık içinde görsel veya bağlantı yok
+  - *Neden önemli:* Boş ya da görsel içeren başlık, içindekiler tablosunda boş satır olarak görünür.
+  - *Nasıl yapılır:* Yazıyı bitirince başlık listesine hızlıca göz gezdir ve boş olanları sil.
 
-## 📄 Icerik
+## 📄 İçerik
 
-- [ ] **CNT_01** · `Onemli` · `otomatik` — Icerik konuyu karsilayacak uzunlukta (en az ~600 kelime)
-  - *Neden:* Kelime sayisi tek basina siralama faktoru degildir; ama konuyu eksik anlatan kisa icerik kullanicinin sorusunu cevaplamaz.
-  - *Nasil:* Ilk 3 rakibin basliklarini ac, senin yazinda olmayan alt konulari ekle.
-- [ ] **CNT_02** · `Onemli` · `otomatik` — Odak anahtar kelime ilk 100 kelimede geciyor
-  - *Neden:* Girisin konuyu hemen netlestirmesi hem kullaniciyi tutar hem konuyu erken bildirir.
-  - *Nasil:* Ilk paragrafi "Bu yazida X nasil yapilir adim adim anlatiyoruz." kalibiyla ac.
-- [ ] **CNT_03** · `Onemli` · `otomatik` — Anahtar kelime yogunlugu %0,5-%2,5 arasinda, tekrar spam'i yok
-  - *Neden:* Ayni kelimenin zorlama tekrari (keyword stuffing) hem okumayi bozar hem spam sinyali uretir.
-  - *Nasil:* Es anlamli ve yakin kelimeler kullan. Kelimeyi zorla sikistirdigin cumleleri sil.
-- [ ] **CNT_04** · `Orta` · `otomatik` — Paragraflar kisa; 150+ kelimelik dev blok yok
-  - *Neden:* Trafigin cogu mobilden gelir; telefonda 150 kelimelik blok bir ekrani tamamen doldurur ve okuyucu birakir.
-  - *Nasil:* Her paragrafi 2-4 cumlede kes. Fikir degisince yeni paragraf ac.
-- [ ] **CNT_05** · `Orta` · `otomatik` — Icerikte liste veya tablo var
-  - *Neden:* Listeler ve tablolar hem taranabilirligi artirir hem one cikan snippet (0. sira) icin en cok secilen formattir.
-  - *Nasil:* Adimlari numarali liste, karsilastirmalari tablo yap.
-- [ ] **CNT_06** · `Onemli` · `yapay zeka` — Yazim ve dilbilgisi kontrolu yapildi
-  - *Neden:* Imla hatasi guven kaybettirir; E-E-A-T degerlendirmesinde dogrudan kalite sinyalidir.
-  - *Nasil:* Yayinlamadan once metni bastan sona bir kez sesli oku.
-- [ ] **CNT_07** · `KRITIK` · `elle` — Icerik ozgun; baska siteden kopyalanmadi
-  - *Neden:* Kopya icerik indekslenmez veya deger gormez; telif riski de dogurur.
-  - *Nasil:* Alinti yapacaksan tirnak icinde ver ve kaynaga link koy.
-- [ ] **CNT_08** · `Onemli` · `yapay zeka` — Sayfanin ustunde ana soruya dogrudan cevap veren 40-60 kelimelik ozet var
-  - *Neden:* Hem one cikan snippet hem de AI ozetleri (AI Overviews, ChatGPT, Perplexity) bu tur net paragraflari alintilar.
-  - *Nasil:* Ilk H2'nin hemen altina, soruyu tek paragrafta net cevaplayan bir bolum koy.
-- [ ] **CNT_09** · `Orta` · `otomatik` — Yazar adi ve guncelleme tarihi sayfada gorunuyor
-  - *Neden:* Kim yazdi ve ne zaman guncellendi bilgisi E-E-A-T sinyalidir; ozellikle saglik/finans konularinda belirleyicidir.
-  - *Nasil:* Yaziyi dogru yazar hesabina ata; tema yazar kutusunu gosteriyor mu kontrol et.
+- [ ] **CNT_01** · `Önemli` · `otomatik` — İçerik konuyu karşılayacak uzunlukta (en az 600 kelime)
+  - *Neden önemli:* Kelime sayısı tek başına bir sıralama faktörü değildir; ama konuyu eksik anlatan kısa içerik kullanıcının sorusunu cevaplamaz.
+  - *Nasıl yapılır:* İlk üç rakibin başlıklarını aç, senin yazında olmayan alt konuları tespit edip ekle.
+- [ ] **CNT_02** · `Önemli` · `otomatik` — Odak anahtar kelime ilk 100 kelimede geçiyor
+  - *Neden önemli:* Girişin konuyu hemen netleştirmesi hem okuyucuyu sayfada tutar hem de konuyu erken bildirir.
+  - *Nasıl yapılır:* İlk paragrafı "Bu yazıda X'in nasıl yapıldığını adım adım anlatıyoruz." kalıbıyla aç.
+- [ ] **CNT_03** · `Önemli` · `otomatik` — Anahtar kelime yoğunluğu %0,5 ile %2,5 arasında
+  - *Neden önemli:* Aynı kelimenin zorlama tekrarı hem okumayı bozar hem de spam sinyali üretir.
+  - *Nasıl yapılır:* Eş anlamlı ve yakın kelimeler kullan. Kelimeyi zorla sıkıştırdığın cümleleri sil.
+- [ ] **CNT_04** · `Orta` · `otomatik` — Paragraflar kısa; 150 kelimeyi aşan dev blok yok
+  - *Neden önemli:* Trafiğin büyük kısmı mobilden gelir. Telefonda 150 kelimelik bir blok tüm ekranı doldurur ve okuyucu bırakır.
+  - *Nasıl yapılır:* Her paragrafı 2-4 cümlede kes. Fikir değişince yeni paragraf aç.
+- [ ] **CNT_05** · `Orta` · `otomatik` — İçerikte liste veya tablo var
+  - *Neden önemli:* Liste ve tablolar hem taranabilirliği artırır hem de öne çıkan snippet için en sık seçilen biçimdir.
+  - *Nasıl yapılır:* Adımları numaralı liste, karşılaştırmaları tablo yap.
+- [ ] **CNT_06** · `Önemli` · `yapay zekâ` — Yazım ve dil bilgisi kontrolü yapıldı
+  - *Neden önemli:* İmla hatası güven kaybettirir ve Google'ın E-E-A-T değerlendirmesinde doğrudan bir kalite sinyalidir.
+  - *Nasıl yapılır:* Yayınlamadan önce metni baştan sona bir kez sesli oku.
+- [ ] **CNT_07** · `KRİTİK` · `elle` — İçerik özgün; başka siteden kopyalanmadı
+  - *Neden önemli:* Kopya içerik ya dizine eklenmez ya da değer görmez; ayrıca telif riski doğurur.
+  - *Nasıl yapılır:* Alıntı yapacaksan tırnak içinde ver ve kaynağa bağlantı koy.
+- [ ] **CNT_08** · `Önemli` · `yapay zekâ` — Sayfanın üstünde ana soruyu doğrudan cevaplayan 40-60 kelimelik özet var
+  - *Neden önemli:* Hem öne çıkan snippet hem de yapay zekâ özetleri (AI Overviews, ChatGPT, Perplexity) bu tür net paragrafları alıntılar.
+  - *Nasıl yapılır:* İlk H2'nin hemen altına, soruyu tek paragrafta net cevaplayan bir bölüm koy.
+- [ ] **CNT_09** · `Orta` · `otomatik` — Yazar adı ve güncelleme tarihi sayfada görünüyor
+  - *Neden önemli:* Kimin yazdığı ve ne zaman güncellendiği bilgisi bir E-E-A-T sinyalidir; özellikle sağlık ve finans konularında belirleyicidir.
+  - *Nasıl yapılır:* Yazıyı doğru yazar hesabına ata ve temanın yazar kutusunu gösterip göstermediğini kontrol et.
 
-## 🖼️ Gorseller
+## 🖼️ Görseller
 
-- [ ] **IMG_01** · `Onemli` · `otomatik` — One cikan gorsel (featured image) eklendi
-  - *Neden:* Kategori listelerinde, sosyal medya paylasiminda ve Discover'da kullanilan gorsel budur. Yoksa yazi bos gorunur.
-  - *Nasil:* Sag panel → "One Cikan Gorsel" → en az 1200x630 piksel bir gorsel sec.
-- [ ] **IMG_02** · `KRITIK` · `otomatik` — Tum gorsellerde anlamli alt metin var
-  - *Neden:* Alt metin gorme engelli kullanicilar icin zorunludur ve gorsel aramasinda tek siralama sinyalidir.
-  - *Nasil:* Gorseli sec → "Alternatif metin" alanina gorseli goremeyen birine anlatir gibi yaz.
-- [ ] **IMG_03** · `Orta` · `yapay zeka` — Alt metinler anahtar kelime yigmasi degil, gercekten gorseli anlatiyor
-  - *Neden:* Her gorsele ayni anahtar kelimeyi yazmak spam sinyalidir.
-  - *Nasil:* "kombi basinc ayari kombi basinc kombi" degil; "Kombi manometresinde 1,5 bar gosteren ibre" yaz.
-- [ ] **IMG_04** · `Orta` · `otomatik` — Dosya adlari aciklayici ve tireli (IMG_4821.jpg degil)
-  - *Neden:* Dosya adi gorsel aramasi icin ek bir baglam sinyalidir.
-  - *Nasil:* Yuklemeden ONCE dosyayi yeniden adlandir: kombi-basinc-ayari.webp
-- [ ] **IMG_05** · `Onemli` · `otomatik` — Gorseller WebP/AVIF formatinda ve makul boyutta (<200 KB)
-  - *Neden:* Gorseller sayfa agirliginin buyuk kismini olusturur; agir gorsel dogrudan LCP'yi ve siralamayi bozar.
-  - *Nasil:* Yuklemeden once TinyPNG/Squoosh ile sikistir, WebP olarak disari aktar.
-- [ ] **IMG_06** · `Orta` · `otomatik` — Gorsellerde width/height tanimli
-  - *Neden:* Boyut verilmezse sayfa yuklenirken icerik ziplar (CLS) ve Core Web Vitals dusar.
-  - *Nasil:* WordPress bunu otomatik ekler; HTML blogunda elle gorsel eklediysen sen yazmalisin.
-- [ ] **IMG_07** · `Orta` · `otomatik` — Ilk ekrandaki gorsel lazy-load DEGIL, alttakiler lazy
-  - *Neden:* Ust gorseli tembel yuklemek LCP suresini dogrudan geciktirir.
-  - *Nasil:* One cikan/ilk gorselde loading="lazy" olmamali. Eklenti "ilk N gorseli haric tut" ayarini destekliyorsa ac.
+- [ ] **IMG_01** · `Önemli` · `otomatik` — Öne çıkan görsel eklendi
+  - *Neden önemli:* Kategori listelerinde, sosyal medya paylaşımında ve Google Discover'da kullanılan görsel budur. Yoksa yazı bomboş görünür.
+  - *Nasıl yapılır:* Sağ panelden "Öne Çıkan Görsel" alanına en az 1200x630 piksel bir görsel seç.
+- [ ] **IMG_02** · `KRİTİK` · `otomatik` — Tüm görsellerde anlamlı alternatif metin var
+  - *Neden önemli:* Alternatif metin görme engelli kullanıcılar için zorunludur ve görsel aramasındaki neredeyse tek sıralama sinyalidir.
+  - *Nasıl yapılır:* Görseli seç, "Alternatif metin" alanına görseli göremeyen birine anlatır gibi yaz.
+- [ ] **IMG_03** · `Orta` · `yapay zekâ` — Alternatif metinler anahtar kelime yığması değil, görseli anlatıyor
+  - *Neden önemli:* Her görsele aynı anahtar kelimeyi yazmak spam sinyalidir ve görsel aramasında işe yaramaz.
+  - *Nasıl yapılır:* "kombi basınç ayarı kombi basınç kombi" değil; "Kombi manometresinde 1,5 bar gösteren ibre" yaz.
+- [ ] **IMG_04** · `Orta` · `otomatik` — Dosya adları açıklayıcı ve tireli (IMG_4821.jpg değil)
+  - *Neden önemli:* Dosya adı, görsel araması için ek bir bağlam sinyalidir.
+  - *Nasıl yapılır:* Yüklemeden önce dosyayı yeniden adlandır: kombi-basinc-ayari.webp
+- [ ] **IMG_05** · `Önemli` · `otomatik` — Görseller WebP veya AVIF biçiminde ve 200 KB altında
+  - *Neden önemli:* Görseller sayfa ağırlığının büyük kısmını oluşturur. Ağır görsel doğrudan LCP süresini ve sıralamayı bozar.
+  - *Nasıl yapılır:* Yüklemeden önce TinyPNG veya Squoosh ile sıkıştır, WebP olarak dışa aktar.
+- [ ] **IMG_06** · `Orta` · `otomatik` — Görsellerde genişlik ve yükseklik tanımlı
+  - *Neden önemli:* Boyut verilmezse sayfa yüklenirken içerik zıplar. Bu, Core Web Vitals'taki CLS puanını düşürür.
+  - *Nasıl yapılır:* WordPress bunu otomatik ekler; HTML bloğuyla elle görsel eklediysen sen yazmalısın.
+- [ ] **IMG_07** · `Orta` · `otomatik` — İlk ekrandaki görsel tembel yüklenmiyor, alttakiler yükleniyor
+  - *Neden önemli:* Üstteki görseli tembel yüklemek (lazy load) LCP süresini doğrudan geciktirir; alttakileri yüklememek ise boşuna veri indirir.
+  - *Nasıl yapılır:* Öne çıkan görselde loading="lazy" olmamalı. Eklentin "ilk N görseli hariç tut" ayarını destekliyorsa aç.
 
-## ⛓️ Baglantilar
+## ⛓️ Bağlantılar
 
-- [ ] **LNK_01** · `Onemli` · `otomatik` — En az 3 ic link var ve alakali sayfalara gidiyor
-  - *Neden:* Ic linkler hem otoriteyi sitede dagitir hem de yeni yazinin kesfedilmesini hizlandirir.
-  - *Nasil:* Yaziyi bitirince konuyla ilgili 3 eski yazi bul, dogal gectigi cumleye link ver.
-- [ ] **LNK_02** · `Orta` · `otomatik` — Anchor metinleri aciklayici; "buraya tiklayin / devami" degil
-  - *Neden:* Anchor metni hedef sayfanin ne hakkinda oldugunu anlatir; "tiklayin" hicbir sey anlatmaz.
-  - *Nasil:* Link verirken hedef sayfanin konusunu iceren 2-4 kelimeyi secip linkle.
-- [ ] **LNK_03** · `Onemli` · `elle` — Bu yeni yaziya en az 1 eski yazidan link verildi
-  - *Neden:* Yeni yazi hicbir sayfadan link almazsa sitede "oksuz" kalir, gec kesfedilir.
-  - *Nasil:* Ilgili eski yaziyi ac, uygun cumleye yeni yazinin linkini ekle ve guncelle.
-- [ ] **LNK_04** · `Orta` · `otomatik` — Dis linkler otoriter kaynaklara veriliyor
-  - *Neden:* Iddiali bilgileri kaynakla desteklemek guvenilirlik (E-E-A-T) sinyalidir.
-  - *Nasil:* Resmi kurum, universite veya sektor otoritesi sitelerini tercih et.
-- [ ] **LNK_05** · `KRITIK` · `otomatik` — Kirik link (404) yok
-  - *Neden:* Kirik link hem kullaniciyi cikmaza sokar hem sayfanin bakimsiz oldugunu gosterir.
-  - *Nasil:* Yayindan sonra denetimi calistir; kirmizi cikan linkleri duzelt.
-- [ ] **LNK_06** · `Onemli` · `otomatik` — Sponsorlu / afiliye linklerde rel="sponsored" veya "nofollow" var
-  - *Neden:* Ucretli linkleri isaretlememek Google'in link semasi yaptirimi kapsamina girer.
-  - *Nasil:* Link ekleme kutusunda "nofollow"/"sponsored" secenegini isaretle.
+- [ ] **LNK_01** · `Önemli` · `otomatik` — En az 3 iç bağlantı var ve alakalı sayfalara gidiyor
+  - *Neden önemli:* İç bağlantılar hem otoriteyi site içinde dağıtır hem de yeni yazının keşfedilmesini hızlandırır.
+  - *Nasıl yapılır:* Yazıyı bitirince konuyla ilgili üç eski yazı bul ve doğal geçtiği cümlede bağlantı ver.
+- [ ] **LNK_02** · `Orta` · `otomatik` — Bağlantı metinleri açıklayıcı; "buraya tıklayın" değil
+  - *Neden önemli:* Bağlantı metni hedef sayfanın ne hakkında olduğunu anlatır. "Tıklayın" hiçbir şey anlatmaz.
+  - *Nasıl yapılır:* Bağlantı verirken hedef sayfanın konusunu içeren 2-4 kelimeyi seçip bağla.
+- [ ] **LNK_03** · `Önemli` · `elle` — Bu yeni yazıya en az 1 eski yazıdan bağlantı verildi
+  - *Neden önemli:* Hiçbir sayfadan bağlantı almayan yeni yazı sitede öksüz kalır ve çok geç keşfedilir.
+  - *Nasıl yapılır:* İlgili eski yazıyı aç, uygun cümleye yeni yazının bağlantısını ekle ve güncelle.
+- [ ] **LNK_04** · `Orta` · `otomatik` — Dış bağlantılar otoriter kaynaklara veriliyor
+  - *Neden önemli:* İddialı bilgileri kaynakla desteklemek doğrudan bir güvenilirlik sinyalidir.
+  - *Nasıl yapılır:* Resmî kurum, üniversite veya sektör otoritesi sitelerini tercih et.
+- [ ] **LNK_05** · `KRİTİK` · `otomatik` — Kırık bağlantı (404) yok
+  - *Neden önemli:* Kırık bağlantı hem kullanıcıyı çıkmaza sokar hem de sayfanın bakımsız olduğunu gösterir.
+  - *Nasıl yapılır:* Yayından sonra denetimi çalıştır ve kırmızı çıkan bağlantıları düzelt.
+- [ ] **LNK_06** · `Önemli` · `otomatik` — Sponsorlu veya ortaklık bağlantılarında rel="sponsored" ya da "nofollow" var
+  - *Neden önemli:* Ücretli bağlantıları işaretlememek, Google'ın bağlantı şeması yaptırımı kapsamına girer.
+  - *Nasıl yapılır:* Bağlantı ekleme kutusunda "nofollow" veya "sponsored" seçeneğini işaretle.
 
-## ⚙️ Teknik & Sosyal
+## ⚙️ Teknik ve Sosyal
 
-- [ ] **TEC_01** · `KRITIK` · `otomatik` — Sayfa indekslenebilir (noindex yok)
-  - *Neden:* noindex etiketi sayfayi Google'dan tamamen siler. Tek satirlik hata, tum emegi bosa cikarir.
-  - *Nasil:* Yoast/Rank Math → Gelismis → "Arama sonuclarinda gorunsun mu?" = Evet.
-- [ ] **TEC_02** · `KRITIK` · `otomatik` — Canonical etiketi sayfanin kendi URL'ine isaret ediyor
-  - *Neden:* Yanlis canonical, Google'a "asil sayfa baskasi" der ve sayfayi siralamadan cikarir.
-  - *Nasil:* Kopyala-yapistir ile yeni yazi acildiginda canonical eski yazida kalabilir; Gelismis sekmesinden kontrol et.
-- [ ] **TEC_03** · `Onemli` · `otomatik` — Article / BlogPosting schema (JSON-LD) mevcut
-  - *Neden:* Yapisal veri, arama sonucunda yazar-tarih gibi zengin bilgilerin cikmasini saglar.
-  - *Nasil:* SEO eklentisi bunu otomatik uretir; "Schema" sekmesinde tipin Article oldugunu dogrula.
-- [ ] **TEC_04** · `Onemli` · `otomatik` — Open Graph baslik / aciklama / gorsel tanimli
-  - *Neden:* WhatsApp ve LinkedIn paylasimlarinda gorunen kutuyu bu etiketler belirler; yoksa link ciplak gorunur.
-  - *Nasil:* Yoast/Rank Math → Sosyal sekmesi. Gorsel en az 1200x630 olmali.
-- [ ] **TEC_05** · `Orta` · `otomatik` — Twitter/X kart etiketleri tanimli
-  - *Neden:* X paylasimlarinda buyuk gorselli kart cikmasini saglar, tiklamayi artirir.
-  - *Nasil:* twitter:card degeri "summary_large_image" olmali.
-- [ ] **TEC_06** · `Onemli` · `otomatik` — Sayfa mobil uyumlu (viewport meta etiketi var)
-  - *Neden:* Google mobil-oncelikli indeksleme yapar; mobilde bozuk sayfa masaustunde de deger kaybeder.
-  - *Nasil:* Tema kaynaklidir. Eksikse temayi duzelttir.
-- [ ] **TEC_07** · `Orta` · `elle` — Sayfa acilis hizi kontrol edildi (LCP < 2,5 sn)
-  - *Neden:* Yavas sayfa hem siralamayi hem donusumu dusurur.
-  - *Nasil:* PageSpeed Insights'a URL'i yapistir, mobil skoruna bak.
-- [ ] **TEC_08** · `Orta` · `elle` — Dogru kategori secildi, etiket (tag) spam'i yapilmadi
-  - *Neden:* Her yaziya 15 etiket acmak yuzlerce zayif arsiv sayfasi uretir ve indeks sisirir.
-  - *Nasil:* Tek kategori sec. En fazla 3-5 etiket kullan, yenisini acmadan once mevcutlara bak.
-- [ ] **TEC_09** · `Orta` · `elle` — Yayin tarihi ve yazar dogru secildi
-  - *Neden:* Yanlis tarih icerigi bayat gosterir; yanlis yazar E-E-A-T sinyalini bozar.
-  - *Nasil:* Sag panelden Yayinla tarihini ve Yazar alanini kontrol et.
+- [ ] **TEC_01** · `KRİTİK` · `otomatik` — Sayfa dizine eklenebilir (noindex yok)
+  - *Neden önemli:* noindex etiketi sayfayı Google'dan tamamen siler. Tek satırlık bu hata tüm emeği boşa çıkarır.
+  - *Nasıl yapılır:* Yoast veya Rank Math → Gelişmiş → "Arama sonuçlarında görünsün mü?" seçeneği Evet olmalı.
+- [ ] **TEC_02** · `KRİTİK` · `otomatik` — Canonical etiketi sayfanın kendi adresini gösteriyor
+  - *Neden önemli:* Yanlış canonical, Google'a "asıl sayfa başkası" der ve bu sayfayı sıralamadan çıkarır.
+  - *Nasıl yapılır:* Yeni yazıyı kopyala-yapıştır ile açtıysan canonical eski yazıda kalmış olabilir; Gelişmiş sekmesinden kontrol et.
+- [ ] **TEC_03** · `Önemli` · `otomatik` — Article veya BlogPosting şeması (JSON-LD) mevcut
+  - *Neden önemli:* Yapısal veri, arama sonucunda yazar ve tarih gibi zengin bilgilerin görünmesini sağlar.
+  - *Nasıl yapılır:* SEO eklentisi bunu otomatik üretir; "Şema" sekmesinde türün Article olduğunu doğrula.
+- [ ] **TEC_04** · `Önemli` · `otomatik` — Open Graph başlık, açıklama ve görseli tanımlı
+  - *Neden önemli:* WhatsApp ve LinkedIn paylaşımlarında görünen önizleme kutusunu bu etiketler belirler. Yoksa bağlantı çıplak görünür.
+  - *Nasıl yapılır:* Yoast veya Rank Math → Sosyal sekmesi. Görsel en az 1200x630 piksel olmalı.
+- [ ] **TEC_05** · `Orta` · `otomatik` — Twitter/X kart etiketleri tanımlı
+  - *Neden önemli:* X paylaşımlarında büyük görselli kart çıkmasını sağlar ve tıklanmayı artırır.
+  - *Nasıl yapılır:* twitter:card değeri "summary_large_image" olmalı.
+- [ ] **TEC_06** · `Önemli` · `otomatik` — Sayfa mobil uyumlu (viewport etiketi var)
+  - *Neden önemli:* Google mobil öncelikli dizine ekleme yapar. Mobilde bozuk bir sayfa masaüstünde de değer kaybeder.
+  - *Nasıl yapılır:* Bu tema kaynaklıdır. Eksikse temayı düzelttir.
+- [ ] **TEC_07** · `Orta` · `elle` — Sayfa açılış hızı kontrol edildi (LCP 2,5 saniyenin altında)
+  - *Neden önemli:* Yavaş sayfa hem sıralamayı hem de dönüşümü düşürür.
+  - *Nasıl yapılır:* PageSpeed Insights'a adresi yapıştır ve mobil skoruna bak.
+- [ ] **TEC_08** · `Orta` · `elle` — Doğru kategori seçildi, etiket kalabalığı yapılmadı
+  - *Neden önemli:* Her yazıya on beş etiket açmak yüzlerce zayıf arşiv sayfası üretir ve dizini şişirir.
+  - *Nasıl yapılır:* Tek kategori seç. En fazla 3-5 etiket kullan ve yenisini açmadan önce mevcutlara bak.
+- [ ] **TEC_09** · `Orta` · `elle` — Yayın tarihi ve yazar doğru seçildi
+  - *Neden önemli:* Yanlış tarih içeriği bayat gösterir; yanlış yazar E-E-A-T sinyalini bozar.
+  - *Nasıl yapılır:* Sağ panelden yayın tarihini ve Yazar alanını kontrol et.
 
-## 🚀 Yayin Oncesi Son Kontrol
+## 🚀 Yayın Öncesi Son Kontrol
 
-- [ ] **PUB_01** · `Onemli` · `elle` — Onizleme hem mobil hem masaustunde kontrol edildi
-  - *Neden:* Tasan tablolar, kirilan gorseller ve bozuk bosluklar sadece onizlemede gorunur.
-  - *Nasil:* Onizle → yeni sekme; sonra tarayiciyi daraltip mobil goruntuye bak.
-- [ ] **PUB_02** · `Orta` · `elle` — URL Search Console'da indekslemeye gonderildi
-  - *Neden:* Manuel istek, yeni icerigin taranmasini gunlerden saatlere indirir.
-  - *Nasil:* Search Console → URL Denetimi → URL yapistir → "Dizine eklenmeyi iste".
-- [ ] **PUB_03** · `KRITIK` · `elle` — Kritik maddelerin tamami yesil, yayina hazir
-  - *Neden:* Son kapi. Kritik bir madde acik kaldiysa yazi yayinlanmamali.
-  - *Nasil:* Ustteki skor kartinda "Kritik" sayaci 0 olmali.
+- [ ] **PUB_01** · `Önemli` · `elle` — Önizleme hem mobilde hem masaüstünde kontrol edildi
+  - *Neden önemli:* Taşan tablolar, kırılan görseller ve bozuk boşluklar yalnızca önizlemede ortaya çıkar.
+  - *Nasıl yapılır:* Önizle bağlantısını yeni sekmede aç; ardından tarayıcı penceresini daraltıp mobil görünüme bak.
+- [ ] **PUB_02** · `Orta` · `elle` — Adres Search Console'da dizine eklenmeye gönderildi
+  - *Neden önemli:* Manuel istek, yeni içeriğin taranmasını günlerden saatlere indirir.
+  - *Nasıl yapılır:* Search Console → URL Denetimi → adresi yapıştır → "Dizine eklenmeyi iste".
+- [ ] **PUB_03** · `KRİTİK` · `elle` — Yazı yayınlanmadan önce baştan sona bir kez daha okundu
+  - *Neden önemli:* Denetim ölçebildiğini ölçer; anlatım bozukluğunu, yanlış bilgiyi ve eksik kalmış bir cümleyi yalnızca insan yakalar. Son okuma bu yüzden atlanamaz.
+  - *Nasıl yapılır:* Yazıyı önizlemede aç ve okuyucu gibi baştan sona oku. Takıldığın her cümleyi düzelt.

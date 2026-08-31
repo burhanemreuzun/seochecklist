@@ -3,7 +3,7 @@ const UA =
   process.env.FETCH_USER_AGENT ||
   'SEOChecklistBot/1.0 (+https://github.com/burhanemreuzun/seochecklist)';
 
-/** Verilen URL'i cekip HTML + yanit ustbilgilerini dondurur. */
+/** Verilen adresi çekip HTML'i ve yanıt üstbilgilerini döndürür. */
 async function fetchPage(url) {
   const started = Date.now();
   const ac = new AbortController();
@@ -30,8 +30,8 @@ async function fetchPage(url) {
 }
 
 /**
- * Bir URL'in durumunu HEAD ile yoklar; HEAD desteklenmiyorsa GET'e duser.
- * Kirik link ve gorsel boyutu kontrollerinde kullanilir.
+ * Bir adresin durumunu HEAD ile yoklar; HEAD desteklenmiyorsa GET'e düşer.
+ * Kırık bağlantı ve görsel boyutu kontrollerinde kullanılır.
  */
 async function probe(url) {
   const ac = new AbortController();
@@ -66,7 +66,7 @@ async function probe(url) {
   }
 }
 
-/** Es zamanli istek sayisini sinirlayarak calistirir. */
+/** Eş zamanlı istek sayısını sınırlayarak çalıştırır. */
 async function mapLimit(items, limit, fn) {
   const out = new Array(items.length);
   let cursor = 0;

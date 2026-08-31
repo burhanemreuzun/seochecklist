@@ -19,7 +19,7 @@ function getPool() {
   return pool;
 }
 
-/** Veritabani adi olmadan baglanir - CREATE DATABASE icin gerekli. */
+/** Veritabanı adı olmadan bağlanır — CREATE DATABASE için gerekli. */
 function serverConnection() {
   const { database, connectionLimit, waitForConnections, ...rest } = config;
   return mysql.createConnection({ ...rest, multipleStatements: true });

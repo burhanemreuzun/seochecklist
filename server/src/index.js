@@ -13,21 +13,26 @@ app.use(express.json({ limit: '1mb' }));
 
 app.use('/api', routes);
 
-// Uretimde derlenmis Vue uygulamasini ayni sunucudan servis et.
+// Üretimde derlenmiş Vue uygulamasını aynı sunucudan servis et.
 const clientDist = path.join(__dirname, '../../client/dist');
 if (require('fs').existsSync(clientDist)) {
   app.use(express.static(clientDist));
   app.get(/^(?!\/api).*/, (_req, res) => res.sendFile(path.join(clientDist, 'index.html')));
 }
 
-// Merkezi hata yakalayici.
+// Merkezî hata yakalayıcı.
+// Beklenmeyen veritabanı hataları kullanıcıya ham haliyle gösterilmez;
+// günlüğe tam hali yazılır, arayüze anlaşılır bir cümle döner.
 app.use((err, _req, res, _next) => {
   const status = err.status || 500;
   if (status >= 500) console.error(err);
-  res.status(status).json({ error: err.message || 'Beklenmeyen hata.' });
+  const message = status >= 500
+    ? 'Sunucuda beklenmeyen bir hata oluştu. Ayrıntı sunucu günlüğünde.'
+    : err.message;
+  res.status(status).json({ error: message });
 });
 
 app.listen(PORT, () => {
-  console.log(`▶ SEO Checklist API  http://localhost:${PORT}`);
-  console.log(`  AI: ${process.env.GEMINI_API_KEY ? (process.env.GEMINI_MODEL || 'gemini-3.7-flash') : 'kapali (GEMINI_API_KEY yok)'}`);
+  console.log(`▶ SEO Kontrol Listesi API  http://localhost:${PORT}`);
+  console.log(`  Yapay zekâ: ${process.env.GEMINI_API_KEY ? (process.env.GEMINI_MODEL || 'gemini-3.7-flash') : 'kapalı (GEMINI_API_KEY tanımlı değil)'}`);
 });

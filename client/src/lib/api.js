@@ -1,4 +1,4 @@
-/** Ince API istemcisi. Hata mesajlarini sunucudan oldugu gibi tasir. */
+/** İnce API istemcisi. Hata mesajlarını sunucudan olduğu gibi taşır. */
 async function request(path, options = {}) {
   const res = await fetch(`/api${path}`, {
     headers: { 'Content-Type': 'application/json' },
@@ -7,7 +7,7 @@ async function request(path, options = {}) {
   });
   if (res.status === 204) return null;
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.error || `Sunucu hatasi (${res.status})`);
+  if (!res.ok) throw new Error(data.error || `Sunucu hatası (${res.status})`);
   return data;
 }
 
@@ -27,7 +27,7 @@ export const api = {
   auditHistory: (id)         => request(`/posts/${id}/audits`),
 };
 
-/** Editor adi tarayicida saklanir - ayri bir giris ekranina gerek yok. */
+/** Editör adı tarayıcıda saklanır; ayrı bir giriş ekranına gerek yok. */
 const EDITOR_KEY = 'seochecklist.editor';
 export const editorName = {
   get: () => { try { return localStorage.getItem(EDITOR_KEY) || ''; } catch { return ''; } },

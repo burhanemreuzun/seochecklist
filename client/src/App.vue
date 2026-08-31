@@ -17,23 +17,23 @@ function saveEditor(e) {
 
 <template>
   <div class="page">
-    <!-- yuzen pill gezinme -->
+    <!-- yüzen gezinme çubuğu -->
     <div class="navwrap">
       <nav class="nav">
         <RouterLink to="/" class="brand">SEO Kontrol<span class="dot">.</span></RouterLink>
 
         <div class="nav-right">
-          <div v-if="health" class="state" :title="health.ok ? 'Sunucu bagli' : 'Sunucuya ulasilamiyor'">
+          <div v-if="health" class="state" :title="health.ok ? 'Sunucu bağlı' : 'Sunucuya ulaşılamıyor'">
             <span class="led" :class="health.ok ? 'on' : 'off'"></span>
             <span class="state-txt">
-              {{ health.ai?.enabled ? health.ai.model : 'AI kapali' }}
+              {{ health.ai?.enabled ? health.ai.model : 'yapay zekâ kapalı' }}
             </span>
           </div>
           <input
             class="who"
             :value="editor"
-            placeholder="Adin"
-            aria-label="Editor adi"
+            placeholder="Adın"
+            aria-label="Editör adı"
             @input="saveEditor"
           />
         </div>
@@ -68,6 +68,7 @@ function saveEditor(e) {
   text-decoration: none; color: var(--ink); white-space: nowrap;
 }
 .brand .dot { color: var(--accent); }
+.state { border: 1px solid var(--line); }
 
 .nav-right { display: flex; align-items: center; gap: 10px; }
 

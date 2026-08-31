@@ -12,7 +12,7 @@ const filter = ref('');
 
 const form = ref({ title: '', url: '', focus_keyword: '' });
 
-const STATUS_LABEL = { draft: 'Taslak', review: 'Kontrolde', published: 'Yayinda' };
+const STATUS_LABEL = { draft: 'Taslak', review: 'Kontrolde', published: 'Yayında' };
 
 const filtered = computed(() => {
   const q = filter.value.trim().toLowerCase();
@@ -48,7 +48,7 @@ async function create() {
 }
 
 async function remove(post) {
-  if (!confirm(`"${post.title}" silinsin mi? Denetim gecmisi de silinir.`)) return;
+  if (!confirm(`"${post.title}" silinsin mi? Denetim geçmişi de birlikte silinir.`)) return;
   try {
     await api.deletePost(post.id);
     posts.value = posts.value.filter((p) => p.id !== post.id);
@@ -68,40 +68,40 @@ onMounted(load);
   <div>
     <!-- hero -->
     <header class="hero rise">
-      <div class="eyebrow">Yayin oncesi kontrol</div>
+      <div class="eyebrow">Yayın öncesi kontrol</div>
       <h1 class="h1">
-        Yayinlamadan once<br />
-        <span class="soft">sayfayi denetleyelim.</span>
+        Yayınlamadan önce<br />
+        <span class="soft">sayfayı denetleyelim.</span>
       </h1>
       <p class="lead hero-lead">
-        58 maddenin 47'si otomatik olculur &mdash; baslik, heading hiyerarsisi, meta aciklama,
-        alt metinler, canonical ve kirik linkler beyan edilmez, olculur.
+        58 maddenin 47'si otomatik ölçülür. Başlık, başlık hiyerarşisi, meta açıklama,
+        alternatif metinler, canonical ve kırık bağlantılar beyan edilmez &mdash; ölçülür.
       </p>
     </header>
 
     <!-- yeni kayit -->
     <section class="card card-pad new-post rise" style="animation-delay: 60ms">
       <div class="new-head">
-        <h2 class="h3">Yeni yazi kaydi</h2>
-        <p class="muted new-sub">Basligi gir, URL'i sonra da ekleyebilirsin.</p>
+        <h2 class="h3">Yeni yazı kaydı</h2>
+        <p class="muted new-sub">Başlığı gir; adresi sonra da ekleyebilirsin.</p>
       </div>
 
       <form class="new-grid" @submit.prevent="create">
         <div class="field" style="grid-area: t">
-          <label for="np-title">Yazi basligi</label>
-          <input id="np-title" v-model="form.title" class="input" placeholder="Kombi basinci nasil ayarlanir?" required />
+          <label for="np-title">Yazı başlığı</label>
+          <input id="np-title" v-model="form.title" class="input" placeholder="Kombi basıncı nasıl ayarlanır?" required />
         </div>
         <div class="field" style="grid-area: k">
           <label for="np-kw">Odak anahtar kelime</label>
-          <input id="np-kw" v-model="form.focus_keyword" class="input" placeholder="kombi basinc ayari" />
+          <input id="np-kw" v-model="form.focus_keyword" class="input" placeholder="kombi basınç ayarı" />
         </div>
         <div class="field" style="grid-area: u">
-          <label for="np-url">URL <span class="opt">opsiyonel</span></label>
+          <label for="np-url">Adres <span class="opt">isteğe bağlı</span></label>
           <input id="np-url" v-model="form.url" class="input mono" placeholder="https://site.com/kombi-basinc-ayari/" />
         </div>
         <div class="submit-cell">
           <button class="btn btn-primary" type="submit" :disabled="creating || !form.title.trim()">
-            {{ creating ? 'Aciliyor' : 'Kaydi ac' }}
+            {{ creating ? 'Açılıyor' : 'Kaydı aç' }}
             <span class="btn-arrow" aria-hidden="true">&#8594;</span>
           </button>
         </div>
@@ -110,17 +110,17 @@ onMounted(load);
 
     <p v-if="error" class="notice">{{ error }}</p>
 
-    <!-- liste -->
+    <!-- kayıtlı yazılar -->
     <div class="spread list-head">
-      <h2 class="h3">Kayitli yazilar <span class="count">{{ posts.length }}</span></h2>
-      <input v-model="filter" class="input search" placeholder="Ara" />
+      <h2 class="h3">Kayıtlı yazılar <span class="count">{{ posts.length }}</span></h2>
+      <input v-model="filter" class="input search" placeholder="Ara" aria-label="Yazılarda ara" />
     </div>
 
-    <div v-if="loading" class="empty">Yukleniyor</div>
+    <div v-if="loading" class="empty">Yükleniyor…</div>
 
     <div v-else-if="!filtered.length" class="empty">
-      <div class="h2">Liste bos</div>
-      <p>Yukaridan ilk yazi kaydini ac.</p>
+      <div class="h2">Liste boş</div>
+      <p>Yukarıdan ilk yazı kaydını aç.</p>
     </div>
 
     <ul v-else class="post-list">
@@ -139,14 +139,14 @@ onMounted(load);
               </span>
               <span v-if="p.focus_keyword" class="kw">{{ p.focus_keyword }}</span>
               <span v-if="p.url" class="url-cell mono">{{ p.url }}</span>
-              <span v-else class="muted">URL girilmemis</span>
+              <span v-else class="muted">Adres girilmemiş</span>
             </div>
           </div>
 
           <div class="post-side">
             <div v-if="p.last_audit_at">{{ String(p.last_audit_at).slice(0, 16) }}</div>
-            <div v-else class="muted">hic denetlenmedi</div>
-            <div class="muted">{{ p.checked_count }} madde isaretli</div>
+            <div v-else class="muted">hiç denetlenmedi</div>
+            <div class="muted">{{ p.checked_count }} madde işaretli</div>
           </div>
 
           <span class="go" aria-hidden="true">&#8594;</span>
@@ -160,10 +160,21 @@ onMounted(load);
 <style scoped>
 .hero { padding: 26px 0 54px; max-width: 760px; }
 .hero .h1 { margin: 16px 0 20px; }
-.hero .soft { color: var(--muted); }
+.hero .soft {
+  /* İkinci satır renk geçişiyle yazılır: sayfaya fotoğraf koymadan renk katar. */
+  background: linear-gradient(96deg, var(--accent) 0%, #6b3ff0 42%, #d63a6a 78%, #e0521f 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+@supports not (background-clip: text) { .hero .soft { color: var(--accent); } }
 .hero-lead { max-width: 620px; margin: 0; }
 
-.new-post { margin-bottom: 66px; }
+.new-post { margin-bottom: 66px; position: relative; overflow: hidden; }
+.new-post::before {
+  content: ''; position: absolute; inset: 0 0 auto 0; height: 3px;
+  background: linear-gradient(90deg, var(--c-url), var(--c-title), var(--c-content), var(--c-publish));
+}
 .new-head { margin-bottom: 22px; }
 .new-sub { margin: 5px 0 0; font-size: 14px; }
 .opt { text-transform: none; letter-spacing: 0; color: #b3b3b3; font-weight: 400; }
@@ -180,7 +191,12 @@ onMounted(load);
 }
 
 .list-head { margin-bottom: 18px; align-items: center; }
-.count { display: inline-block; margin-left: 6px; font-size: 13px; font-weight: 500; color: var(--muted); letter-spacing: 0; }
+.count {
+  display: inline-block; margin-left: 8px; padding: 2px 10px;
+  border-radius: var(--r-pill);
+  background: var(--accent-soft); color: var(--accent);
+  font-size: 12.5px; font-weight: 500; letter-spacing: 0;
+}
 .search { width: 210px; padding: 9px 15px; font-size: 13.5px; border-radius: var(--r-pill); }
 
 .post-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
