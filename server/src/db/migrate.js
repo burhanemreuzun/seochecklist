@@ -40,11 +40,20 @@ async function addMissingColumns(conn, database) {
   }
 
   try {
-    await conn.query(
-      `CREATE DATABASE IF NOT EXISTS \`${config.database}\`
-       CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
-    );
-    await conn.changeUser({ database: config.database });
+    // Paylaşımlı hostingte veritabanını panel oluşturur ve kullanıcının
+    // CREATE DATABASE yetkisi olmaz. Bu yüzden önce doğrudan bağlanmayı dene;
+    // yalnızca veritabanı yoksa oluşturmaya kalk.
+    try {
+      await conn.changeUser({ database: config.database });
+    } catch (err) {
+      if (err.code !== 'ER_BAD_DB_ERROR') throw err;
+      console.log(`· "${config.database}" bulunamadı, oluşturuluyor…`);
+      await conn.query(
+        `CREATE DATABASE IF NOT EXISTS \`${config.database}\`
+         CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
+      );
+      await conn.changeUser({ database: config.database });
+    }
 
     const sql = fs.readFileSync(path.join(__dirname, 'schema.sql'), 'utf8');
     await conn.query(sql);

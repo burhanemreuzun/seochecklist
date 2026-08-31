@@ -268,14 +268,35 @@ grep -E '^(APP_PASSWORD_HASH|SESSION_SECRET|GEMINI_API_KEY)=' .env
 Bu iki değeri elle uydurma; `set-password` komutunun ürettiklerini kullan.
 Sunucuda `.env` dosyası bulunmaz, değerler platformun ortam değişkenlerinden okunur.
 
-### İlk açılış
+### Veritabanı kurulumu
 
-`AUTO_MIGRATE=true` ile başlat: tablolar oluşturulur ve 93 madde yüklenir. Her
-iki işlem de yinelenebilir olduğu için değişkeni açık bırakmak zarar vermez;
-her yeniden dağıtımda madde metinleri de güncellenmiş olur.
+Önce hosting panelinden **boş bir MySQL veritabanı** aç ve kullanıcı bilgilerini
+al. Tabloların kurulması için iki yol var:
 
-Veritabanına ulaşılamazsa sunucu yine de açılır ve `/api/health` `"database":
-"kapalı"` döndürür; sorunu oradan görebilirsin.
+**1. Otomatik (önerilen).** `AUTO_MIGRATE=true` ile başlat; tablolar oluşturulur
+ve 93 madde yüklenir. Paylaşımlı hostingte veritabanı kullanıcısının
+`CREATE DATABASE` yetkisi olmaz; kod bunu bilir ve panelin açtığı veritabanına
+doğrudan bağlanır, yalnızca gerçekten yoksa oluşturmayı dener.
+
+Her iki adım da yinelenebilir olduğu için değişkeni açık bırakmak zarar vermez;
+her yeniden dağıtımda madde metinleri de güncellenir.
+
+**2. Elle içe aktarma.** Sunucuda kurulum çalışmıyorsa hazır SQL dosyasını
+kullan:
+
+```bash
+npm run db:sql        # docs/seochecklist.sql dosyasını üretir
+```
+
+phpMyAdmin → veritabanını seç → **İçe Aktar** → dosyayı yükle. Dosya
+`CREATE DATABASE` içermez, hedef veritabanı önceden seçilmiş olmalıdır. Tablolar
+`IF NOT EXISTS`, kayıtlar `ON DUPLICATE KEY UPDATE` ile yazıldığı için aynı dosya
+defalarca aktarılabilir; var olan işaretler ve denetim geçmişi silinmez.
+
+Bu yolu seçersen `AUTO_MIGRATE` değişkenini hiç tanımlama.
+
+Veritabanına ulaşılamazsa sunucu yine de açılır ve `/api/health`
+`"database": "kapalı"` ile birlikte sebebini döndürür.
 
 ### HTTPS
 

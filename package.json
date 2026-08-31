@@ -7,6 +7,7 @@
     "setup": "npm install && npm run db:setup",
     "db:setup": "node server/src/db/migrate.js && node server/src/db/seed.js",
     "db:seed": "node server/src/db/seed.js",
+    "db:sql": "node server/src/db/export-sql.js",
     "dev:server": "node --watch server/src/index.js",
     "dev:client": "npm run dev --workspace client",
     "build": "npm run build --workspace client",
