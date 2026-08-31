@@ -230,9 +230,15 @@ Depoyu GitHub üzerinden içe aktaran panellerde (Hostinger Web Apps ve benzerle
 
 Proje npm workspaces kullanır: kökte tek bir `npm install`, hem `client` hem
 `server` bağımlılıklarını kurar ve hepsini kök `node_modules` altında toplar.
-Bu yüzden panelin hangi kurulum komutunu çalıştırdığı önemli değildir.
-`hosting:build` kurulum ve derlemeyi birlikte yapar; kurulum zaten yapılmışsa
-ikinci kez çalışması zarar vermez.
+Ayrıca `postinstall` adımı arayüzü kurulum sırasında derler. Bu yüzden panel
+yalnızca `npm install` çalıştırsa bile uygulama eksiksiz ayağa kalkar; ayrı bir
+derleme komutu tanımlıysa o adım işi devralır.
+
+`postinstall` kurulumu asla başarısız kılmaz: `vite` kurulu değilse (üretim
+kurulumunda geliştirme bağımlılıkları atlanmış olabilir) sessizce atlar.
+
+Derleme hiç çalışmazsa sunucu "Cannot GET /" yerine ne yapılması gerektiğini
+anlatan bir sayfa döndürür ve API çalışmaya devam eder.
 
 Çıktı dizini boş bırakılır çünkü derlenmiş arayüzü panelin statik sunucusu değil,
 Express'in kendisi servis eder. Oraya `client/dist` yazılırsa `/giris`, `/yazi/3`

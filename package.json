@@ -10,6 +10,7 @@
     "dev:server": "node --watch server/src/index.js",
     "dev:client": "npm run dev --workspace client",
     "build": "npm run build --workspace client",
+    "postinstall": "node scripts/postinstall.js",
     "hosting:build": "npm install && npm run build",
     "start": "node server/src/index.js",
     "check": "node server/src/cli.js",
