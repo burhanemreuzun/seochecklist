@@ -1,6 +1,6 @@
 # SEO Kontrol Listesi
 
-Denetim listesi 58 madde, yazım listesi 36 adım.
+Denetim listesi 58 madde, yazım listesi 35 adım.
 Bu dosya `checklist.seed.js` ve `writing.seed.js` dosyalarından üretilir; elle düzenleme.
 
 | İşaret | Anlamı |
@@ -29,9 +29,9 @@ Sıfırdan yazarken yukarıdan aşağı takip edilir. Tamamı elle işaretlenir;
 - [ ] **WRT_P04** · `Önemli` · `elle` — Rakiplerin cevaplamadığı en az 1 soru bulundu
   - *Neden önemli:* Aynı şeyi tekrar yazan bir içeriğin öne geçmesi için sebep yoktur. Ayırt edici tarafın olmalı.
   - *Nasıl yapılır:* Rakip listende eksik kalan soruyu, kendi deneyimini, güncel bir veriyi ya da somut bir örneği ekle.
-- [ ] **WRT_P05** · `Orta` · `elle` — "İnsanlar bunları da soruyor" kutusundaki sorular not edildi
-  - *Neden önemli:* Bu kutu, Google'ın kullanıcıların gerçekten sorduğunu bildiği soruları gösterir. Her biri bir alt başlık adayıdır.
-  - *Nasıl yapılır:* Odak kelimeyi ara, kutudaki soruları aç ve genişleyen yeni soruları da not et.
+- [ ] **WRT_P05** · `Orta` · `elle` — Sıkça sorulan sorular belirlendi
+  - *Neden önemli:* Okuyucunun aklına takılan sorular hem içeriğin alt başlıklarını verir hem de öne çıkan snippet ve yapay zekâ özetlerinde en çok alıntılanan bölümdür.
+  - *Nasıl yapılır:* Odak kelimeyi Google'da ara; sonuç sayfasındaki soru kutusundaki ve "İlgili aramalar" bölümündeki soruları topla. Bunlardan bir SSS bölümü çıkar.
 - [ ] **WRT_P06** · `KRİTİK` · `elle` — Sitede aynı konuyu işleyen eski bir yazı olmadığı doğrulandı
   - *Neden önemli:* Aynı konuda iki yazı birbiriyle yarışır ve ikisi de geriler. Buna anahtar kelime yamyamlığı denir.
   - *Nasıl yapılır:* Google'da ara: site:siteadi.com "odak kelime". Benzer yazı çıkarsa yenisini yazmak yerine eskisini güncellemeyi düşün.
@@ -41,9 +41,6 @@ Sıfırdan yazarken yukarıdan aşağı takip edilir. Tamamı elle işaretlenir;
 
 ## 🧭 Kurgu ve İskelet
 
-- [ ] **WRT_K01** · `Önemli` · `elle` — Yazının cevaplayacağı ana soru tek cümleyle yazıldı
-  - *Neden önemli:* Ana soruyu tek cümlede yazamıyorsan konu henüz netleşmemiştir; yazı da dağılır.
-  - *Nasıl yapılır:* Bir kâğıda yaz: "Bu yazı şu soruyu cevaplıyor: …". Yazarken takıldığında bu cümleye dön.
 - [ ] **WRT_K02** · `Önemli` · `elle` — Önce H2 alt başlıkları yazıldı, iskelet çıkarıldı
   - *Neden önemli:* İskeletsiz yazmak konunun dağılmasına ve aynı şeyin iki yerde anlatılmasına yol açar.
   - *Nasıl yapılır:* Metne başlamadan önce yalnızca alt başlıkları yaz. Sırasını beğenene kadar oynat, sonra doldurmaya başla.
@@ -71,9 +68,9 @@ Sıfırdan yazarken yukarıdan aşağı takip edilir. Tamamı elle işaretlenir;
 - [ ] **WRT_Y04** · `Önemli` · `elle` — Her bölüm tek bir konuyu anlatıyor
   - *Neden önemli:* Konu dağılan bölümler okuyucuyu yorar ve içindekiler yapısını anlamsızlaştırır.
   - *Nasıl yapılır:* Bölümü bitirince sor: bu başlığın altındaki her cümle bu başlıkla ilgili mi? Değilse taşı.
-- [ ] **WRT_Y05** · `Orta` · `elle` — Paragraflar 2-4 cümle uzunluğunda
-  - *Neden önemli:* Trafiğin çoğu mobilden gelir; uzun blok telefonda tüm ekranı kaplar ve okuyucu bırakır.
-  - *Nasıl yapılır:* Fikir değişince yeni paragraf aç. Dört cümleyi geçen paragrafı böl.
+- [ ] **WRT_Y05** · `Orta` · `elle` — Paragraflar en az 2-4 cümle uzunluğunda
+  - *Neden önemli:* Tek cümlelik paragraflar metni parçalar; okuyucu fikri toparlayamaz ve yazı derinliksiz görünür. Bir paragraf, bir düşünceyi başından sonuna anlatacak kadar dolu olmalı.
+  - *Nasıl yapılır:* Tek cümlede kalan paragrafı ya bir önceki paragrafla birleştir ya da düşünceyi açacak iki cümle daha ekle.
 - [ ] **WRT_Y06** · `Orta` · `elle` — Jargon açıklandı ya da sadeleştirildi
   - *Neden önemli:* Anlamadığı terimle karşılaşan okuyucu geri döner. Terimi açıklamak otorite kaybı değil, kazancıdır.
   - *Nasıl yapılır:* Terimi ilk kullandığın yerde parantez içinde tek cümleyle açıkla.
@@ -95,12 +92,12 @@ Sıfırdan yazarken yukarıdan aşağı takip edilir. Tamamı elle işaretlenir;
 - [ ] **WRT_G01** · `Önemli` · `elle` — Öne çıkan görsel hazırlandı (en az 1200x630)
   - *Neden önemli:* Kategori listelerinde, sosyal paylaşımlarda ve Discover'da görünen görsel budur.
   - *Nasıl yapılır:* Yatay, üstünde metin varsa okunaklı bir görsel seç. 1200x630 en güvenli ölçüdür.
-- [ ] **WRT_G02** · `Önemli` · `elle` — Görseller yüklemeden önce sıkıştırıldı ve WebP'ye çevrildi
-  - *Neden önemli:* Görseller sayfa ağırlığının büyük kısmıdır. Yükledikten sonra düzeltmek zordur, öncesinde yapılır.
-  - *Nasıl yapılır:* TinyPNG ya da Squoosh ile sıkıştır, WebP olarak dışa aktar, 200 KB altını hedefle.
 - [ ] **WRT_G03** · `Orta` · `elle` — Dosya adları açıklayıcı ve tireli yazıldı
   - *Neden önemli:* Dosya adı görsel araması için ek bir bağlam sinyalidir; IMG_4821.jpg hiçbir şey anlatmaz.
   - *Nasıl yapılır:* Yüklemeden ÖNCE yeniden adlandır: kombi-basinc-ayari.webp
+- [ ] **WRT_G08** · `Orta` · `elle` — Görselin adına kendi marka adımız eklenmedi
+  - *Neden önemli:* Dosya adı, görselin ne olduğunu anlatmak içindir. Her görsele marka adını eklemek arama için bir katkı sağlamaz; adı uzatır, gerçek konuyu geriye iter ve tekrar eden kelime yığını izlenimi verir.
+  - *Nasıl yapılır:* Görseli neyin resmi olduğuna göre adlandır: "kombi-manometre-gostergesi.webp". Marka adını yalnızca gerçekten markaya ait bir görselde kullan (logo, ürün fotoğrafı, ekip fotoğrafı gibi).
 - [ ] **WRT_G04** · `KRİTİK` · `elle` — Her görsele alternatif metin yazıldı
   - *Neden önemli:* Görme engelli kullanıcılar için zorunludur ve görsel aramasındaki neredeyse tek sıralama sinyalidir.
   - *Nasıl yapılır:* Görseli göremeyen birine anlatır gibi yaz. Anahtar kelimeyi tekrarlamak değil, görseli tarif etmek amaç.
@@ -125,9 +122,9 @@ Sıfırdan yazarken yukarıdan aşağı takip edilir. Tamamı elle işaretlenir;
 - [ ] **WRT_H03** · `KRİTİK` · `elle` — Kalıcı bağlantı kısaltıldı, Türkçe karakterler temizlendi
   - *Neden önemli:* WordPress başlıktan uzun bir adres üretir; Türkçe karakterler adreste okunmaz kodlara dönüşür.
   - *Nasıl yapılır:* Yayınlamadan ÖNCE düzelt: 3-5 kelime, yalnızca küçük harf, rakam ve tire. Yayından sonra değiştirmek 301 gerektirir.
-- [ ] **WRT_H04** · `Orta` · `elle` — Kategori seçildi, etiketler sınırlı tutuldu
-  - *Neden önemli:* Her yazıya on beş etiket açmak yüzlerce zayıf arşiv sayfası üretir ve dizini şişirir.
-  - *Nasıl yapılır:* Tek kategori seç, en fazla 3-5 etiket kullan ve yeni etiket açmadan önce mevcutlara bak.
+- [ ] **WRT_H04** · `Orta` · `elle` — Kategori seçildi, etiket kullanılmadı
+  - *Neden önemli:* Her etiket kendi arşiv sayfasını üretir. Bu sayfalarda özgün içerik yoktur; dizini şişirir, birbirine benzeyen zayıf sayfalar yaratır ve kategori sayfalarıyla yarışır.
+  - *Nasıl yapılır:* Tek ve doğru kategoriyi seç. Etiket alanını tamamen boş bırak; sınıflandırma için kategori yeterlidir.
 - [ ] **WRT_H05** · `Orta` · `elle` — Yazar ve yayın tarihi doğru seçildi
   - *Neden önemli:* Kim yazdı ve ne zaman yazıldı bilgisi bir E-E-A-T sinyalidir.
   - *Nasıl yapılır:* Sağ panelden yazarı ve tarihi kontrol et; taslak uzun süre beklediyse tarih eskimiş olabilir.

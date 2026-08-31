@@ -20,7 +20,7 @@ const FLOWS = [
   },
   {
     v: 'write', icon: '✍️', label: 'Sıfırdan içerik yazıyorum',
-    desc: '36 adımlık yazım listesini takip et, yaptıkça işaretle.',
+    desc: '35 adımlık yazım listesini takip et, yaptıkça işaretle.',
   },
 ];
 const FLOW_LABEL = { audit: 'Denetim', write: 'Yazım' };

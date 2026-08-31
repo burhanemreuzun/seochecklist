@@ -48,9 +48,9 @@ const ITEMS = [
   },
   {
     code: 'WRT_P05', category: 'plan', severity: 'medium', weight: 1,
-    label: '"İnsanlar bunları da soruyor" kutusundaki sorular not edildi',
-    why: 'Bu kutu, Google\'ın kullanıcıların gerçekten sorduğunu bildiği soruları gösterir. Her biri bir alt başlık adayıdır.',
-    how: 'Odak kelimeyi ara, kutudaki soruları aç ve genişleyen yeni soruları da not et.',
+    label: 'Sıkça sorulan sorular belirlendi',
+    why: 'Okuyucunun aklına takılan sorular hem içeriğin alt başlıklarını verir hem de öne çıkan snippet ve yapay zekâ özetlerinde en çok alıntılanan bölümdür.',
+    how: 'Odak kelimeyi Google\'da ara; sonuç sayfasındaki soru kutusundaki ve "İlgili aramalar" bölümündeki soruları topla. Bunlardan bir SSS bölümü çıkar.',
   },
   {
     code: 'WRT_P06', category: 'plan', severity: 'critical', weight: 3,
@@ -66,12 +66,6 @@ const ITEMS = [
   },
 
   // ─────────────────── KURGU ───────────────────
-  {
-    code: 'WRT_K01', category: 'outline', severity: 'high', weight: 2,
-    label: 'Yazının cevaplayacağı ana soru tek cümleyle yazıldı',
-    why: 'Ana soruyu tek cümlede yazamıyorsan konu henüz netleşmemiştir; yazı da dağılır.',
-    how: 'Bir kâğıda yaz: "Bu yazı şu soruyu cevaplıyor: …". Yazarken takıldığında bu cümleye dön.',
-  },
   {
     code: 'WRT_K02', category: 'outline', severity: 'high', weight: 2,
     label: 'Önce H2 alt başlıkları yazıldı, iskelet çıkarıldı',
@@ -124,9 +118,9 @@ const ITEMS = [
   },
   {
     code: 'WRT_Y05', category: 'writing', severity: 'medium', weight: 1,
-    label: 'Paragraflar 2-4 cümle uzunluğunda',
-    why: 'Trafiğin çoğu mobilden gelir; uzun blok telefonda tüm ekranı kaplar ve okuyucu bırakır.',
-    how: 'Fikir değişince yeni paragraf aç. Dört cümleyi geçen paragrafı böl.',
+    label: 'Paragraflar en az 2-4 cümle uzunluğunda',
+    why: 'Tek cümlelik paragraflar metni parçalar; okuyucu fikri toparlayamaz ve yazı derinliksiz görünür. Bir paragraf, bir düşünceyi başından sonuna anlatacak kadar dolu olmalı.',
+    how: 'Tek cümlede kalan paragrafı ya bir önceki paragrafla birleştir ya da düşünceyi açacak iki cümle daha ekle.',
   },
   {
     code: 'WRT_Y06', category: 'writing', severity: 'medium', weight: 1,
@@ -167,16 +161,16 @@ const ITEMS = [
     how: 'Yatay, üstünde metin varsa okunaklı bir görsel seç. 1200x630 en güvenli ölçüdür.',
   },
   {
-    code: 'WRT_G02', category: 'assets', severity: 'high', weight: 2,
-    label: 'Görseller yüklemeden önce sıkıştırıldı ve WebP\'ye çevrildi',
-    why: 'Görseller sayfa ağırlığının büyük kısmıdır. Yükledikten sonra düzeltmek zordur, öncesinde yapılır.',
-    how: 'TinyPNG ya da Squoosh ile sıkıştır, WebP olarak dışa aktar, 200 KB altını hedefle.',
-  },
-  {
     code: 'WRT_G03', category: 'assets', severity: 'medium', weight: 1,
     label: 'Dosya adları açıklayıcı ve tireli yazıldı',
     why: 'Dosya adı görsel araması için ek bir bağlam sinyalidir; IMG_4821.jpg hiçbir şey anlatmaz.',
     how: 'Yüklemeden ÖNCE yeniden adlandır: kombi-basinc-ayari.webp',
+  },
+  {
+    code: 'WRT_G08', category: 'assets', severity: 'medium', weight: 1,
+    label: 'Görselin adına kendi marka adımız eklenmedi',
+    why: 'Dosya adı, görselin ne olduğunu anlatmak içindir. Her görsele marka adını eklemek arama için bir katkı sağlamaz; adı uzatır, gerçek konuyu geriye iter ve tekrar eden kelime yığını izlenimi verir.',
+    how: 'Görseli neyin resmi olduğuna göre adlandır: "kombi-manometre-gostergesi.webp". Marka adını yalnızca gerçekten markaya ait bir görselde kullan (logo, ürün fotoğrafı, ekip fotoğrafı gibi).',
   },
   {
     code: 'WRT_G04', category: 'assets', severity: 'critical', weight: 3,
@@ -224,9 +218,9 @@ const ITEMS = [
   },
   {
     code: 'WRT_H04', category: 'prepublish', severity: 'medium', weight: 1,
-    label: 'Kategori seçildi, etiketler sınırlı tutuldu',
-    why: 'Her yazıya on beş etiket açmak yüzlerce zayıf arşiv sayfası üretir ve dizini şişirir.',
-    how: 'Tek kategori seç, en fazla 3-5 etiket kullan ve yeni etiket açmadan önce mevcutlara bak.',
+    label: 'Kategori seçildi, etiket kullanılmadı',
+    why: 'Her etiket kendi arşiv sayfasını üretir. Bu sayfalarda özgün içerik yoktur; dizini şişirir, birbirine benzeyen zayıf sayfalar yaratır ve kategori sayfalarıyla yarışır.',
+    how: 'Tek ve doğru kategoriyi seç. Etiket alanını tamamen boş bırak; sınıflandırma için kategori yeterlidir.',
   },
   {
     code: 'WRT_H05', category: 'prepublish', severity: 'medium', weight: 1,

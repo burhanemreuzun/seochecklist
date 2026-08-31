@@ -8,7 +8,7 @@ Kayıt açarken iki çalışma biçiminden biri seçilir:
 | Biçim | Ne zaman | Ne yapar |
 | --- | --- | --- |
 | 🔎 **Var olan içeriğimi kontrol et** | Sayfa yayında | Adres verilir, 58 maddenin 47'si otomatik ölçülür |
-| ✍️ **Sıfırdan içerik yazıyorum** | Yazı henüz yok | 36 adımlık yazım listesi; editör yaptıkça işaretler |
+| ✍️ **Sıfırdan içerik yazıyorum** | Yazı henüz yok | 35 adımlık yazım listesi; editör yaptıkça işaretler |
 
 Yazım akışıyla açılan bir kayıtta iki liste de bulunur. Editör önce yazım listesini takip ederek
 içeriği üretir; yayınladıktan sonra adresi girip **Sayfa denetimi** sekmesinden ölçümü çalıştırır.
@@ -39,7 +39,7 @@ işaretlemeye çalışan istek 409 ile reddedilir.
 Editörün işaretleyeceği 11 madde ise gerçekten dışarıdan ölçülemeyen şeylerdir: içeriğin
 özgünlüğü, eski bir yazıdan bağlantı verilmesi, Search Console'a gönderim, son okuma.
 
-Yazım listesinin 36 adımının tamamı elle işaretlenir; bu bir istisna değil, zorunluluktur:
+Yazım listesinin 35 adımının tamamı elle işaretlenir; bu bir istisna değil, zorunluluktur:
 o aşamada ortada ölçülecek bir sayfa henüz yoktur.
 
 İkinci karar: **ölçülebilen hiçbir şey yapay zekâya bırakılmadı.** Model karakter saymaz, `<h3>`
@@ -57,7 +57,7 @@ Gereksinimler: **Node.js 20+**, **MySQL 8+**
 git clone https://github.com/burhanemreuzun/seochecklist.git
 cd seochecklist
 cp .env.example .env      # ayarları doldur
-npm run setup             # bağımlılıklar, veritabanı ve 94 madde
+npm run setup             # bağımlılıklar, veritabanı ve 93 madde
 ```
 
 Giriş parolasını belirle:
@@ -157,7 +157,7 @@ server/
     index.js           orkestrasyon ve skorlama
   src/db/
     checklist.seed.js  ★ 58 denetim maddesinin tek doğruluk kaynağı
-    writing.seed.js    ★ 36 yazım adımının tek doğruluk kaynağı
+    writing.seed.js    ★ 35 yazım adımının tek doğruluk kaynağı
     schema.sql         MySQL şeması
   src/routes/          REST API
 docs/CHECKLIST.md      yazdırılabilir liste (iki seed dosyasından üretilir)
