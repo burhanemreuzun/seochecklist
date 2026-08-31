@@ -1,0 +1,17 @@
+{
+  "name": "seochecklist",
+  "version": "1.0.0",
+  "private": true,
+  "description": "WordPress yazilari icin yayin oncesi SEO kontrol listesi - kural motoru + Gemini destekli otomatik denetim",
+  "scripts": {
+    "setup": "npm --prefix server install && npm --prefix client install && npm run db:setup",
+    "db:setup": "npm --prefix server run db:setup",
+    "db:seed": "npm --prefix server run db:seed",
+    "dev:server": "npm --prefix server run dev",
+    "dev:client": "npm --prefix client run dev",
+    "build": "npm --prefix client run build",
+    "start": "npm --prefix server start",
+    "check": "node server/src/cli.js"
+  },
+  "engines": { "node": ">=20" }
+}

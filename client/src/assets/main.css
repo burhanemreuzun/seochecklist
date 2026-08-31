@@ -1,0 +1,193 @@
+/* ─────────────────────────────────────────────────────────────
+   SEO Kontrol Listesi — "matbaa duzeltme provasi" temasi
+   Sicak kagit zemin · murekkep siyahi · duzeltmen kirmizisi
+   ───────────────────────────────────────────────────────────── */
+
+:root {
+  /* Kagit ve murekkep */
+  --paper:        #f2ede1;
+  --paper-2:      #faf7f0;
+  --paper-3:      #e8e1d1;
+  --ink:          #16130f;
+  --ink-2:        #423b31;
+  --ink-3:        #7b7060;
+  --rule:         #d6cdb9;
+  --rule-strong:  #b8ac93;
+
+  /* Duzeltmen isaretleri */
+  --red:          #c0301c;
+  --red-soft:     #f7e2dd;
+  --amber:        #b07407;
+  --amber-soft:   #f8ecd4;
+  --green:        #3d6b3a;
+  --green-soft:   #e2ecdc;
+  --blue:         #2c5578;
+  --blue-soft:    #dfe8f0;
+
+  --serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  --sans:  'Archivo', 'Helvetica Neue', Helvetica, sans-serif;
+  --mono:  'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --shadow-lift: 0 1px 0 var(--rule-strong), 0 8px 24px -12px rgba(22, 19, 15, 0.35);
+}
+
+* { box-sizing: border-box; }
+
+html, body, #app { height: 100%; }
+
+body {
+  margin: 0;
+  background-color: var(--paper);
+  /* Kagit dokusu: ince grain + cok hafif yatay cizgi */
+  background-image:
+    radial-gradient(circle at 15% 12%, rgba(192, 48, 28, 0.05), transparent 45%),
+    radial-gradient(circle at 85% 78%, rgba(44, 85, 120, 0.045), transparent 42%),
+    repeating-linear-gradient(0deg, transparent 0 3px, rgba(22, 19, 15, 0.012) 3px 4px);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--red); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+
+/* ───────────── tipografi ───────────── */
+.display {
+  font-family: var(--serif);
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  line-height: 1.05;
+}
+.mono { font-family: var(--mono); }
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+/* ───────────── kabuk ───────────── */
+.shell { max-width: 1180px; margin: 0 auto; padding: 0 28px 96px; }
+
+.masthead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 30px 0 18px;
+  border-bottom: 2px solid var(--ink);
+  margin-bottom: 2px;
+}
+.masthead::after { content: ''; }
+.masthead-rule {
+  height: 1px; background: var(--ink); opacity: 0.35; margin-bottom: 26px;
+}
+.masthead h1 {
+  font-family: var(--serif);
+  font-size: clamp(30px, 4.4vw, 46px);
+  margin: 2px 0 0;
+  letter-spacing: -0.02em;
+}
+.masthead h1 em { font-style: italic; color: var(--red); }
+
+/* ───────────── kartlar ───────────── */
+.card {
+  background: var(--paper-2);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  box-shadow: var(--shadow-lift);
+}
+.card-pad { padding: 22px 24px; }
+
+/* ───────────── butonlar ───────────── */
+button { font-family: inherit; font-size: inherit; cursor: pointer; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 18px;
+  border: 1.5px solid var(--ink);
+  border-radius: 2px;
+  background: var(--paper-2);
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 13.5px;
+  letter-spacing: 0.01em;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+}
+.btn:hover:not(:disabled) { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink); }
+.btn:active:not(:disabled) { transform: translate(0, 0); box-shadow: 1px 1px 0 var(--ink); }
+.btn:disabled { opacity: 0.42; cursor: not-allowed; }
+.btn-primary { background: var(--red); border-color: var(--red); color: #fff; }
+.btn-primary:hover:not(:disabled) { box-shadow: 3px 3px 0 var(--ink); }
+.btn-ghost { border-color: var(--rule-strong); background: transparent; font-weight: 500; }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+
+/* ───────────── form ───────────── */
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-family: var(--mono); font-size: 10.5px; font-weight: 600;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
+.input, select.input, textarea.input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 2px;
+  background: var(--paper-2);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 14px;
+}
+.input:focus { outline: 2px solid var(--red); outline-offset: -1px; border-color: var(--red); }
+.input.mono { font-family: var(--mono); font-size: 13px; }
+
+/* ───────────── durum rozetleri ───────────── */
+.badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 2px 8px;
+  border-radius: 2px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+.badge-pass   { background: var(--green-soft); color: var(--green); border-color: #bcd0b4; }
+.badge-warn   { background: var(--amber-soft); color: var(--amber); border-color: #e2ceA0; }
+.badge-fail   { background: var(--red-soft);   color: var(--red);   border-color: #e6bfb6; }
+.badge-skip   { background: var(--paper-3);    color: var(--ink-3); border-color: var(--rule-strong); }
+.badge-manual { background: var(--blue-soft);  color: var(--blue);  border-color: #bdcfdd; }
+
+.sev-critical { color: var(--red); }
+.sev-high     { color: var(--amber); }
+.sev-medium   { color: var(--ink-3); }
+
+/* ───────────── yardimci ───────────── */
+.muted { color: var(--ink-3); }
+.stack { display: flex; flex-direction: column; }
+.row { display: flex; align-items: center; }
+.spread { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.wrap { flex-wrap: wrap; }
+.grow { flex: 1; }
+
+.empty {
+  text-align: center; padding: 64px 24px; color: var(--ink-3);
+}
+.empty .display { font-size: 26px; color: var(--ink-2); margin-bottom: 8px; }
+
+/* ───────────── animasyon ───────────── */
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.rise { animation: rise 0.42s cubic-bezier(0.2, 0.7, 0.3, 1) both; }
+
+@keyframes stamp {
+  0%   { opacity: 0; transform: scale(1.5) rotate(-8deg); }
+  60%  { opacity: 1; transform: scale(0.94) rotate(-3deg); }
+  100% { opacity: 1; transform: scale(1) rotate(-3deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
