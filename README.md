@@ -211,18 +211,25 @@ Uygulama tek bir Node süreci olarak çalışır: derlenmiş Vue arayüzünü ve
 aynı porttan verir. Ayrıca **bir MySQL veritabanına ihtiyaç duyar**; bunu hosting
 panelinden ayrıca açman ve bilgilerini ortam değişkeni olarak girmen gerekir.
 
-### Derleme ve başlatma
+### Panel ayarları
 
-```bash
-npm ci --prefix server --omit=dev && npm ci --prefix client && npm run build
-```
+Depoyu GitHub üzerinden içe aktaran panellerde (Hostinger Web Apps ve benzerleri):
 
-```bash
-npm start
-```
+| Alan | Değer |
+| --- | --- |
+| Framework ön ayarı | **Express** — sunucu tarafı bir uygulama; statik ön ayar seçilirse Node süreci başlamaz |
+| Kök dizin | `./` |
+| Node sürümü | 20 ya da üstü |
+| Paket yöneticisi | npm |
+| Derleme komutu | `npm run hosting:build` |
+| Giriş dosyası | `server/src/index.js` |
+| Çıktı dizini | boş bırak |
+
+`hosting:build`, iki çalışma alanının bağımlılıklarını kurup arayüzü derler.
+Çıktı dizini boş bırakılır çünkü derlenmiş arayüzü panelin statik sunucusu değil,
+Express'in kendisi servis eder.
 
 Sunucu `PORT` değişkenini kullanır; platform kendi portunu verir, elle ayarlama.
-Kök dizin deponun kökü (`./`) olmalı. Node 20 ve üstü gerekir.
 
 ### Ortam değişkenleri
 
