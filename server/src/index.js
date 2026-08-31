@@ -8,8 +8,11 @@ const routes = require('./routes');
 const app = express();
 const PORT = Number(process.env.PORT || 3001);
 
-app.use(cors({ origin: process.env.CLIENT_ORIGIN || true }));
+// Çerezli oturum kullanıldığı için köken serbest bırakılmaz.
+app.use(cors({ origin: process.env.CLIENT_ORIGIN || true, credentials: true }));
 app.use(express.json({ limit: '1mb' }));
+// Giriş denemelerini IP başına sınırlayabilmek için gerçek istemci adresi gerekir.
+app.set('trust proxy', 1);
 
 app.use('/api', routes);
 
@@ -31,6 +34,10 @@ app.use((err, _req, res, _next) => {
     : err.message;
   res.status(status).json({ error: message });
 });
+
+if (!process.env.APP_PASSWORD_HASH) {
+  console.warn('⚠ APP_PASSWORD_HASH tanımlı değil — giriş yapılamaz. `npm run set-password "parola"` çalıştır.');
+}
 
 app.listen(PORT, () => {
   console.log(`▶ SEO Kontrol Listesi API  http://localhost:${PORT}`);

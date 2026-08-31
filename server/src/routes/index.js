@@ -1,6 +1,7 @@
 const express = require('express');
 const { getPool } = require('../db/pool');
 const { auditUrl } = require('../audit');
+const auth = require('../auth');
 
 const router = express.Router();
 const db = () => getPool();
@@ -11,6 +12,8 @@ const wrap = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).cat
 const httpError = (status, message) => Object.assign(new Error(message), { status });
 
 const STATUSES = ['draft', 'review', 'published'];
+const FLOWS = ['audit', 'write'];
+const LISTS = ['audit', 'write'];
 
 /** Yol parametresindeki kimliği doğrular; geçersizse 400 üretir. */
 function parseId(raw) {
@@ -72,6 +75,12 @@ function cleanPostFields(body, { partial = false } = {}) {
     out.status = st;
   }
 
+  if ('flow' in body) {
+    const fl = String(body.flow ?? '').trim();
+    if (!FLOWS.includes(fl)) throw httpError(400, 'Geçersiz çalışma biçimi.');
+    out.flow = fl;
+  }
+
   if ('notes' in body) {
     const n = String(body.notes ?? '').trim();
     out.notes = n || null;
@@ -79,6 +88,38 @@ function cleanPostFields(body, { partial = false } = {}) {
 
   return out;
 }
+
+// ─────────────────────────── giriş ───────────────────────────
+// Bu üç rota korumasızdır; geri kalan her şey requireAuth arkasındadır.
+
+router.get('/auth/me', (req, res) => {
+  res.json({ authenticated: auth.isAuthenticated(req) });
+});
+
+router.post('/auth/login', wrap(async (req, res) => {
+  const ip = req.ip || req.socket.remoteAddress || 'bilinmiyor';
+  const limit = auth.rateLimit(ip);
+  if (!limit.allowed) {
+    throw httpError(429, `Çok fazla hatalı deneme. ${limit.retryInMin} dakika sonra tekrar dene.`);
+  }
+
+  const hash = process.env.APP_PASSWORD_HASH;
+  if (!hash) throw httpError(500, 'Sunucuda parola tanımlı değil. `npm run set-password` çalıştırılmalı.');
+
+  const password = String(req.body?.password ?? '');
+  if (!auth.verifyPassword(password, hash)) {
+    throw httpError(401, 'Parola hatalı.');
+  }
+
+  auth.resetRateLimit(ip);
+  auth.setSessionCookie(res, auth.issueToken());
+  res.json({ ok: true });
+}));
+
+router.post('/auth/logout', (_req, res) => {
+  auth.clearSessionCookie(res);
+  res.json({ ok: true });
+});
 
 // ─────────────────────────── sağlık ───────────────────────────
 router.get('/health', wrap(async (_req, res) => {
@@ -96,14 +137,24 @@ router.get('/health', wrap(async (_req, res) => {
   });
 }));
 
+// ─── Buradan sonraki tüm rotalar oturum ister ───
+router.use(auth.requireAuth);
+
 // ─────────────────────────── kontrol listesi tanımı ───────────────────────────
-router.get('/checklist', wrap(async (_req, res) => {
-  const [categories] = await db().query('SELECT * FROM categories ORDER BY sort');
-  const [items] = await db().query(
-    `SELECT code, category_key, label, why, how, severity, weight, mode, sort
-       FROM checklist_items WHERE is_active = 1 ORDER BY sort`
+/** ?list=audit (varsayılan) ya da ?list=write */
+router.get('/checklist', wrap(async (req, res) => {
+  const list = String(req.query.list || 'audit');
+  if (!LISTS.includes(list)) throw httpError(400, 'Geçersiz liste.');
+
+  const [categories] = await db().query(
+    'SELECT * FROM categories WHERE `list` = ? ORDER BY sort', [list]
   );
-  res.json({ categories, items });
+  const [items] = await db().query(
+    `SELECT code, \`list\`, category_key, label, why, how, severity, weight, mode, sort
+       FROM checklist_items WHERE is_active = 1 AND \`list\` = ? ORDER BY sort`,
+    [list]
+  );
+  res.json({ list, categories, items });
 }));
 
 // ─────────────────────────── yazılar ───────────────────────────
@@ -135,13 +186,14 @@ router.get('/posts', wrap(async (req, res) => {
 router.post('/posts', wrap(async (req, res) => {
   const f = cleanPostFields(req.body || {});
   const [r] = await db().query(
-    `INSERT INTO posts (title, url, focus_keyword, editor, status, notes)
-     VALUES (:title, :url, :focus_keyword, :editor, :status, :notes)`,
+    `INSERT INTO posts (title, url, focus_keyword, editor, flow, status, notes)
+     VALUES (:title, :url, :focus_keyword, :editor, :flow, :status, :notes)`,
     {
       title: f.title,
       url: f.url ?? null,
       focus_keyword: f.focus_keyword ?? null,
       editor: f.editor ?? null,
+      flow: f.flow ?? 'audit',
       status: f.status ?? 'draft',
       notes: f.notes ?? null,
     }

@@ -1,16 +1,22 @@
 -- SEO Kontrol Listesi veritabanı şeması (MySQL 8+)
 -- Karakter seti: Türkçe içerik için utf8mb4 zorunludur.
 
+-- `list` iki kontrol listesini ayırır:
+--   'audit' → yayındaki sayfayı denetleyen liste
+--   'write' → sıfırdan içerik yazarken izlenen liste
 CREATE TABLE IF NOT EXISTS categories (
   `key`   VARCHAR(32)  NOT NULL PRIMARY KEY,
+  `list`  VARCHAR(16)  NOT NULL DEFAULT 'audit',
   label   VARCHAR(128) NOT NULL,
   icon    VARCHAR(16)  NULL,
-  sort    INT          NOT NULL DEFAULT 0
+  sort    INT          NOT NULL DEFAULT 0,
+  INDEX idx_category_list (`list`, sort)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS checklist_items (
   id           INT AUTO_INCREMENT PRIMARY KEY,
   code         VARCHAR(16)  NOT NULL UNIQUE,
+  `list`       VARCHAR(16)  NOT NULL DEFAULT 'audit',
   category_key VARCHAR(32)  NOT NULL,
   label        VARCHAR(255) NOT NULL,
   why          TEXT         NULL,
@@ -22,7 +28,8 @@ CREATE TABLE IF NOT EXISTS checklist_items (
   is_active    TINYINT(1)   NOT NULL DEFAULT 1,
   CONSTRAINT fk_item_category FOREIGN KEY (category_key)
     REFERENCES categories(`key`) ON UPDATE CASCADE ON DELETE RESTRICT,
-  INDEX idx_item_category (category_key, sort)
+  INDEX idx_item_category (category_key, sort),
+  INDEX idx_item_list (`list`, sort)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Denetlenen her yazı bir "post" kaydıdır.
@@ -32,6 +39,8 @@ CREATE TABLE IF NOT EXISTS posts (
   url           VARCHAR(768) NULL,
   focus_keyword VARCHAR(160) NULL,
   editor        VARCHAR(120) NULL,
+  -- flow: 'audit' → var olan içeriği denetle · 'write' → sıfırdan yaz
+  flow          ENUM('audit','write') NOT NULL DEFAULT 'audit',
   status        ENUM('draft','review','published') NOT NULL DEFAULT 'draft',
   notes         TEXT NULL,
   created_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,

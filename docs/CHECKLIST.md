@@ -1,13 +1,148 @@
 # SEO Kontrol Listesi
 
-58 madde, 9 başlık altında.
-Bu dosya `server/src/db/checklist.seed.js` dosyasından üretilir; elle düzenleme.
+Denetim listesi 58 madde, yazım listesi 36 adım.
+Bu dosya `checklist.seed.js` ve `writing.seed.js` dosyalarından üretilir; elle düzenleme.
 
 | İşaret | Anlamı |
 | --- | --- |
 | `otomatik` | Kural motoru ölçer, editör işaretleyemez. |
 | `yapay zekâ` | Gemini değerlendirir, editör işaretleyemez. |
 | `elle` | Editörün kontrol edip işaretlemesi gerekir. |
+
+---
+
+# Yazım listesi — sıfırdan içerik
+
+Sıfırdan yazarken yukarıdan aşağı takip edilir. Tamamı elle işaretlenir; ortada henüz ölçülecek bir sayfa yoktur.
+
+## 🔍 Araştırma ve Plan
+
+- [ ] **WRT_P01** · `KRİTİK` · `elle` — Odak anahtar kelime belirlendi
+  - *Neden önemli:* Anahtar kelime seçilmeden yazılan içerik, hiç kimsenin aramadığı bir soruyu cevaplama riski taşır. Bütün kararlar bu kelimeye dayanır.
+  - *Nasıl yapılır:* Tek bir odak kelime seç. Google'da yazıp otomatik tamamlama ve alttaki "İlgili aramalar" bölümüne bak; insanların gerçekten nasıl aradığını oradan gör.
+- [ ] **WRT_P02** · `KRİTİK` · `elle` — Arama niyeti tespit edildi
+  - *Neden önemli:* Google, kullanıcının ne beklediğine göre sıralar. Bilgi arayan birine ürün sayfası göstermez. Niyeti yanlış okursan içerik ne kadar iyi olursa olsun sıralanmaz.
+  - *Nasıl yapılır:* Odak kelimeyi ara ve ilk 10 sonucun türüne bak: rehber mi, liste mi, ürün sayfası mı, video mu? Sen de aynı türü üret.
+- [ ] **WRT_P03** · `Önemli` · `elle` — İlk 3 rakip içerik açıldı, alt konuları çıkarıldı
+  - *Neden önemli:* İlk sıradakiler Google'ın "bu konu böyle anlatılır" onayını almış içeriklerdir. Neyi kapsadıklarını bilmeden eksik yazarsın.
+  - *Nasıl yapılır:* İlk 3 sonucu aç, her birinin H2 başlıklarını bir kenara listele. Ortak başlıklar senin yazında da olmalı.
+- [ ] **WRT_P04** · `Önemli` · `elle` — Rakiplerin cevaplamadığı en az 1 soru bulundu
+  - *Neden önemli:* Aynı şeyi tekrar yazan bir içeriğin öne geçmesi için sebep yoktur. Ayırt edici tarafın olmalı.
+  - *Nasıl yapılır:* Rakip listende eksik kalan soruyu, kendi deneyimini, güncel bir veriyi ya da somut bir örneği ekle.
+- [ ] **WRT_P05** · `Orta` · `elle` — "İnsanlar bunları da soruyor" kutusundaki sorular not edildi
+  - *Neden önemli:* Bu kutu, Google'ın kullanıcıların gerçekten sorduğunu bildiği soruları gösterir. Her biri bir alt başlık adayıdır.
+  - *Nasıl yapılır:* Odak kelimeyi ara, kutudaki soruları aç ve genişleyen yeni soruları da not et.
+- [ ] **WRT_P06** · `KRİTİK` · `elle` — Sitede aynı konuyu işleyen eski bir yazı olmadığı doğrulandı
+  - *Neden önemli:* Aynı konuda iki yazı birbiriyle yarışır ve ikisi de geriler. Buna anahtar kelime yamyamlığı denir.
+  - *Nasıl yapılır:* Google'da ara: site:siteadi.com "odak kelime". Benzer yazı çıkarsa yenisini yazmak yerine eskisini güncellemeyi düşün.
+- [ ] **WRT_P07** · `Orta` · `elle` — Hedef okuyucu ve bilgi seviyesi netleştirildi
+  - *Neden önemli:* Yeni başlayana yazılan metinle uzmana yazılan metin farklıdır. İkisinin arasında kalan yazı kimseye ulaşmaz.
+  - *Nasıl yapılır:* Tek cümleyle yaz: "Bu yazı, X konusunu hiç bilmeyen birine Y'yi anlatıyor."
+
+## 🧭 Kurgu ve İskelet
+
+- [ ] **WRT_K01** · `Önemli` · `elle` — Yazının cevaplayacağı ana soru tek cümleyle yazıldı
+  - *Neden önemli:* Ana soruyu tek cümlede yazamıyorsan konu henüz netleşmemiştir; yazı da dağılır.
+  - *Nasıl yapılır:* Bir kâğıda yaz: "Bu yazı şu soruyu cevaplıyor: …". Yazarken takıldığında bu cümleye dön.
+- [ ] **WRT_K02** · `Önemli` · `elle` — Önce H2 alt başlıkları yazıldı, iskelet çıkarıldı
+  - *Neden önemli:* İskeletsiz yazmak konunun dağılmasına ve aynı şeyin iki yerde anlatılmasına yol açar.
+  - *Nasıl yapılır:* Metne başlamadan önce yalnızca alt başlıkları yaz. Sırasını beğenene kadar oynat, sonra doldurmaya başla.
+- [ ] **WRT_K03** · `Önemli` · `elle` — Alt başlıklar arama karşılığı olan ifadelerden seçildi
+  - *Neden önemli:* Alt başlıklar uzun kuyruk aramalarını yakalar ve öne çıkan snippet için kullanılır. "Sonuç" hiçbir arama karşılamaz.
+  - *Nasıl yapılır:* Araştırma adımında topladığın soruları doğrudan alt başlığa çevir: "Hangi Yöntem Daha Ucuz?" gibi.
+- [ ] **WRT_K04** · `Orta` · `elle` — Hedef uzunluk rakiplere bakılarak belirlendi
+  - *Neden önemli:* Uzunluk tek başına sıralamaz; ama rakipler konuyu 1500 kelimede anlatıyorsa 400 kelime eksik kalır.
+  - *Nasıl yapılır:* Rakip yazıların uzunluğuna bak ve benzer bir hedef koy. Doldurmak için değil, kapsamak için yaz.
+- [ ] **WRT_K05** · `Orta` · `elle` — Hangi bölümün liste, hangisinin tablo olacağı kararlaştırıldı
+  - *Neden önemli:* Liste ve tablolar hem okumayı kolaylaştırır hem de öne çıkan snippet olarak en çok seçilen biçimdir.
+  - *Nasıl yapılır:* İskelette işaretle: adımlar numaralı liste, karşılaştırmalar tablo, özellikler madde listesi.
+
+## ✍️ Yazım
+
+- [ ] **WRT_Y01** · `KRİTİK` · `elle` — Giriş, okuyucunun sorusunu ilk iki cümlede karşılıyor
+  - *Neden önemli:* Okuyucu aradığı şeyi ilk ekranda göremezse geri döner. Uzun girişler en çok terk edilen bölümdür.
+  - *Nasıl yapılır:* Girişte konuya ısınma yapma. İlk cümlede sorunu, ikinci cümlede yazının ne vaat ettiğini söyle.
+- [ ] **WRT_Y02** · `Önemli` · `elle` — Ana sorunun 40-60 kelimelik net cevabı üste kondu
+  - *Neden önemli:* Hem öne çıkan snippet hem de yapay zekâ özetleri bu tür kısa, bağımsız paragrafları alıntılar.
+  - *Nasıl yapılır:* İlk alt başlığın hemen altına, tek başına okunduğunda anlamlı olan kısa bir cevap paragrafı koy.
+- [ ] **WRT_Y03** · `Önemli` · `elle` — Odak anahtar kelime ilk 100 kelimede doğal biçimde geçiyor
+  - *Neden önemli:* Girişin konuyu erken netleştirmesi hem okuyucuyu tutar hem de konuyu bildirir.
+  - *Nasıl yapılır:* Kelimeyi cümlenin içine yedir. Zorlama geldiyse cümleyi yeniden kur, kelimeyi sıkıştırma.
+- [ ] **WRT_Y04** · `Önemli` · `elle` — Her bölüm tek bir konuyu anlatıyor
+  - *Neden önemli:* Konu dağılan bölümler okuyucuyu yorar ve içindekiler yapısını anlamsızlaştırır.
+  - *Nasıl yapılır:* Bölümü bitirince sor: bu başlığın altındaki her cümle bu başlıkla ilgili mi? Değilse taşı.
+- [ ] **WRT_Y05** · `Orta` · `elle` — Paragraflar 2-4 cümle uzunluğunda
+  - *Neden önemli:* Trafiğin çoğu mobilden gelir; uzun blok telefonda tüm ekranı kaplar ve okuyucu bırakır.
+  - *Nasıl yapılır:* Fikir değişince yeni paragraf aç. Dört cümleyi geçen paragrafı böl.
+- [ ] **WRT_Y06** · `Orta` · `elle` — Jargon açıklandı ya da sadeleştirildi
+  - *Neden önemli:* Anlamadığı terimle karşılaşan okuyucu geri döner. Terimi açıklamak otorite kaybı değil, kazancıdır.
+  - *Nasıl yapılır:* Terimi ilk kullandığın yerde parantez içinde tek cümleyle açıkla.
+- [ ] **WRT_Y07** · `Önemli` · `elle` — İddialar örnek, veri ya da kaynakla desteklendi
+  - *Neden önemli:* Desteklenmemiş iddia güven kaybettirir; kaynak göstermek doğrudan bir E-E-A-T sinyalidir.
+  - *Nasıl yapılır:* Sayı verdiğin her yere kaynağını ekle. Genel geçer cümleleri somut örnekle değiştir.
+- [ ] **WRT_Y08** · `Önemli` · `elle` — Yazı baştan sona sesli okundu
+  - *Neden önemli:* Sesli okuma, gözle fark edilmeyen devrik ve uzun cümleleri anında ortaya çıkarır.
+  - *Nasıl yapılır:* Nefesin yetmediği cümleyi böl, dilin dolandığı yeri yeniden yaz.
+- [ ] **WRT_Y09** · `KRİTİK` · `elle` — Yapay zekâ kullanıldıysa her bilgi tek tek doğrulandı
+  - *Neden önemli:* Dil modelleri kendinden emin biçimde yanlış bilgi, sahte istatistik ve olmayan kaynak üretebilir. Yayınlanan yanlış bilginin sorumlusu sensin.
+  - *Nasıl yapılır:* Her sayıyı, tarihi, isim ve kaynağı bağımsız bir yerden doğrula. Doğrulayamadığını sil.
+- [ ] **WRT_Y10** · `KRİTİK` · `elle` — Metin özgün; başka bir siteden kopyalanmadı
+  - *Neden önemli:* Kopya içerik ya dizine eklenmez ya da değer görmez; ayrıca telif riski doğurur.
+  - *Nasıl yapılır:* Alıntıyı tırnak içinde ver ve kaynağa bağlantı koy. Gerisini kendi cümlelerinle yaz.
+
+## 🎨 Görsel ve Bağlantı
+
+- [ ] **WRT_G01** · `Önemli` · `elle` — Öne çıkan görsel hazırlandı (en az 1200x630)
+  - *Neden önemli:* Kategori listelerinde, sosyal paylaşımlarda ve Discover'da görünen görsel budur.
+  - *Nasıl yapılır:* Yatay, üstünde metin varsa okunaklı bir görsel seç. 1200x630 en güvenli ölçüdür.
+- [ ] **WRT_G02** · `Önemli` · `elle` — Görseller yüklemeden önce sıkıştırıldı ve WebP'ye çevrildi
+  - *Neden önemli:* Görseller sayfa ağırlığının büyük kısmıdır. Yükledikten sonra düzeltmek zordur, öncesinde yapılır.
+  - *Nasıl yapılır:* TinyPNG ya da Squoosh ile sıkıştır, WebP olarak dışa aktar, 200 KB altını hedefle.
+- [ ] **WRT_G03** · `Orta` · `elle` — Dosya adları açıklayıcı ve tireli yazıldı
+  - *Neden önemli:* Dosya adı görsel araması için ek bir bağlam sinyalidir; IMG_4821.jpg hiçbir şey anlatmaz.
+  - *Nasıl yapılır:* Yüklemeden ÖNCE yeniden adlandır: kombi-basinc-ayari.webp
+- [ ] **WRT_G04** · `KRİTİK` · `elle` — Her görsele alternatif metin yazıldı
+  - *Neden önemli:* Görme engelli kullanıcılar için zorunludur ve görsel aramasındaki neredeyse tek sıralama sinyalidir.
+  - *Nasıl yapılır:* Görseli göremeyen birine anlatır gibi yaz. Anahtar kelimeyi tekrarlamak değil, görseli tarif etmek amaç.
+- [ ] **WRT_G05** · `Önemli` · `elle` — En az 3 eski yazıya iç bağlantı verildi
+  - *Neden önemli:* İç bağlantılar otoriteyi site içinde dağıtır ve okuyucuyu sitede tutar.
+  - *Nasıl yapılır:* Bağlantıyı hedef sayfanın konusunu içeren 2-4 kelimeye ver; "buraya tıklayın" yazma.
+- [ ] **WRT_G06** · `Orta` · `elle` — En az 1 otoriter dış kaynağa bağlantı verildi
+  - *Neden önemli:* İddiaları kaynakla desteklemek güvenilirlik sinyalidir ve okuyucuya saygıdır.
+  - *Nasıl yapılır:* Resmî kurum, üniversite ya da sektör otoritesi sitelerini tercih et.
+- [ ] **WRT_G07** · `Önemli` · `elle` — Bu yazıya bağlantı verecek eski yazı belirlendi
+  - *Neden önemli:* Hiçbir sayfadan bağlantı almayan yeni yazı sitede öksüz kalır ve geç keşfedilir.
+  - *Nasıl yapılır:* İlgili eski yazıyı şimdiden belirle. Yayınlar yayınlamaz o yazıya girip bağlantıyı ekle.
+
+## 📮 Yayın Hazırlığı
+
+- [ ] **WRT_H01** · `KRİTİK` · `elle` — SEO başlığı yazıldı, 50-60 karakter
+  - *Neden önemli:* Arama sonucunda görünen ve tıklanmayı belirleyen metin budur. Uzun olan kırpılır.
+  - *Nasıl yapılır:* Kalıp: "[Odak Kelime] + ayırt edici fayda". Yazı başlığından farklı olabilir, arama odaklı kur.
+- [ ] **WRT_H02** · `KRİTİK` · `elle` — Meta açıklama elle yazıldı, 120-158 karakter
+  - *Neden önemli:* Boş bırakırsan Google sayfadan rastgele bir cümle çeker; genelde işe yaramaz bir cümle olur.
+  - *Nasıl yapılır:* İlk paragrafı kopyalama. Okuyucunun ne kazanacağını söyleyen yeni bir cümle yaz.
+- [ ] **WRT_H03** · `KRİTİK` · `elle` — Kalıcı bağlantı kısaltıldı, Türkçe karakterler temizlendi
+  - *Neden önemli:* WordPress başlıktan uzun bir adres üretir; Türkçe karakterler adreste okunmaz kodlara dönüşür.
+  - *Nasıl yapılır:* Yayınlamadan ÖNCE düzelt: 3-5 kelime, yalnızca küçük harf, rakam ve tire. Yayından sonra değiştirmek 301 gerektirir.
+- [ ] **WRT_H04** · `Orta` · `elle` — Kategori seçildi, etiketler sınırlı tutuldu
+  - *Neden önemli:* Her yazıya on beş etiket açmak yüzlerce zayıf arşiv sayfası üretir ve dizini şişirir.
+  - *Nasıl yapılır:* Tek kategori seç, en fazla 3-5 etiket kullan ve yeni etiket açmadan önce mevcutlara bak.
+- [ ] **WRT_H05** · `Orta` · `elle` — Yazar ve yayın tarihi doğru seçildi
+  - *Neden önemli:* Kim yazdı ve ne zaman yazıldı bilgisi bir E-E-A-T sinyalidir.
+  - *Nasıl yapılır:* Sağ panelden yazarı ve tarihi kontrol et; taslak uzun süre beklediyse tarih eskimiş olabilir.
+- [ ] **WRT_H06** · `Önemli` · `elle` — Önizleme mobilde kontrol edildi
+  - *Neden önemli:* Taşan tablolar, kırılan görseller ve bozuk boşluklar yalnızca önizlemede ortaya çıkar.
+  - *Nasıl yapılır:* Önizlemeyi yeni sekmede aç, sonra pencereyi daraltıp telefon genişliğinde bak.
+- [ ] **WRT_H07** · `Önemli` · `elle` — Yayınlandı ve adres bu kayda girildi
+  - *Neden önemli:* Yazım listesi iyi bir taslak üretir ama yayınlanan sayfayı ölçmez. Ölçüm ancak adres girildikten sonra yapılabilir.
+  - *Nasıl yapılır:* Yayınla, adresi yukarıdaki alana yapıştır ve "Kontrol Et"e bas. 47 madde otomatik denetlenecek.
+
+---
+
+# Denetim listesi — var olan sayfa
+
+Yayındaki sayfaya karşı çalıştırılır. 47 madde otomatik ölçülür, 11 madde editörün kontrolündedir.
 
 ## 🔗 URL ve Kalıcı Bağlantı
 

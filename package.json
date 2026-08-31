@@ -11,7 +11,10 @@
     "dev:client": "npm --prefix client run dev",
     "build": "npm --prefix client run build",
     "start": "npm --prefix server start",
-    "check": "node server/src/cli.js"
+    "check": "node server/src/cli.js",
+    "set-password": "npm --prefix server run set-password --"
   },
-  "engines": { "node": ">=20" }
+  "engines": {
+    "node": ">=20"
+  }
 }

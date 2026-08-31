@@ -45,6 +45,13 @@
   --c-technical: #2f7d4f;
   --c-publish:   #e0521f;
 
+  /* Yazım listesinin aşama renkleri */
+  --c-plan:       #0a86b8;
+  --c-outline:    #6b3ff0;
+  --c-writing:    #d63a6a;
+  --c-assets:     #c47a00;
+  --c-prepublish: #2f7d4f;
+
   /* Form */
   --r-card:      14px;
   --r-input:     10px;
@@ -246,6 +253,11 @@ select.input { appearance: none; background-image:
 .cat-link      { --c: var(--c-link); }
 .cat-technical { --c: var(--c-technical); }
 .cat-publish   { --c: var(--c-publish); }
+.cat-plan       { --c: var(--c-plan); }
+.cat-outline    { --c: var(--c-outline); }
+.cat-writing    { --c: var(--c-writing); }
+.cat-assets     { --c: var(--c-assets); }
+.cat-prepublish { --c: var(--c-prepublish); }
 
 /* Kategori simgesi için renkli yuvarlak rozet */
 .cat-chip {

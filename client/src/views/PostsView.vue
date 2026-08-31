@@ -10,7 +10,20 @@ const error = ref('');
 const creating = ref(false);
 const filter = ref('');
 
-const form = ref({ title: '', url: '', focus_keyword: '' });
+const form = ref({ title: '', url: '', focus_keyword: '', flow: 'audit' });
+
+/** İki çalışma biçimi: var olanı denetle ya da sıfırdan yaz. */
+const FLOWS = [
+  {
+    v: 'audit', icon: '🔎', label: 'Var olan içeriğimi kontrol et',
+    desc: 'Yayındaki sayfanın adresini ver; 47 madde otomatik ölçülsün.',
+  },
+  {
+    v: 'write', icon: '✍️', label: 'Sıfırdan içerik yazıyorum',
+    desc: '36 adımlık yazım listesini takip et, yaptıkça işaretle.',
+  },
+];
+const FLOW_LABEL = { audit: 'Denetim', write: 'Yazım' };
 
 const STATUS_LABEL = { draft: 'Taslak', review: 'Kontrolde', published: 'Yayında' };
 
@@ -86,6 +99,20 @@ onMounted(load);
         <p class="muted new-sub">Başlığı gir; adresi sonra da ekleyebilirsin.</p>
       </div>
 
+      <!-- çalışma biçimi seçimi -->
+      <fieldset class="flows">
+        <legend class="sr-only">Çalışma biçimi</legend>
+        <label v-for="f in FLOWS" :key="f.v" class="flow" :class="{ on: form.flow === f.v }">
+          <input v-model="form.flow" type="radio" name="flow" :value="f.v" />
+          <span class="flow-icon">{{ f.icon }}</span>
+          <span class="flow-text">
+            <span class="flow-label">{{ f.label }}</span>
+            <span class="flow-desc">{{ f.desc }}</span>
+          </span>
+          <span class="flow-mark" aria-hidden="true">&#10003;</span>
+        </label>
+      </fieldset>
+
       <form class="new-grid" @submit.prevent="create">
         <div class="field" style="grid-area: t">
           <label for="np-title">Yazı başlığı</label>
@@ -96,8 +123,14 @@ onMounted(load);
           <input id="np-kw" v-model="form.focus_keyword" class="input" placeholder="kombi basınç ayarı" />
         </div>
         <div class="field" style="grid-area: u">
-          <label for="np-url">Adres <span class="opt">isteğe bağlı</span></label>
-          <input id="np-url" v-model="form.url" class="input mono" placeholder="https://site.com/kombi-basinc-ayari/" />
+          <label for="np-url">
+            Adres
+            <span class="opt">{{ form.flow === 'write' ? 'yayınlayınca girersin' : 'sonra da eklenebilir' }}</span>
+          </label>
+          <input
+            id="np-url" v-model="form.url" class="input mono"
+            :placeholder="form.flow === 'write' ? 'Yazı henüz yayınlanmadıysa boş bırak' : 'https://site.com/kombi-basinc-ayari/'"
+          />
         </div>
         <div class="submit-cell">
           <button class="btn btn-primary" type="submit" :disabled="creating || !form.title.trim()">
@@ -137,6 +170,7 @@ onMounted(load);
               <span class="badge" :class="'badge-' + (p.status === 'published' ? 'pass' : p.status === 'review' ? 'warn' : 'skip')">
                 {{ STATUS_LABEL[p.status] }}
               </span>
+              <span class="flow-tag" :class="'ft-' + p.flow">{{ FLOW_LABEL[p.flow] || 'Denetim' }}</span>
               <span v-if="p.focus_keyword" class="kw">{{ p.focus_keyword }}</span>
               <span v-if="p.url" class="url-cell mono">{{ p.url }}</span>
               <span v-else class="muted">Adres girilmemiş</span>
@@ -179,6 +213,53 @@ onMounted(load);
 .new-sub { margin: 5px 0 0; font-size: 14px; }
 .opt { text-transform: none; letter-spacing: 0; color: #b3b3b3; font-weight: 400; }
 
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+.flows {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  border: 0; padding: 0; margin: 0 0 22px;
+}
+@media (max-width: 720px) { .flows { grid-template-columns: 1fr; } }
+
+.flow {
+  position: relative;
+  display: flex; align-items: flex-start; gap: 13px;
+  padding: 16px 17px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  cursor: pointer;
+  transition: border-color 0.16s ease, background 0.16s ease, box-shadow 0.16s ease;
+}
+.flow input { position: absolute; opacity: 0; pointer-events: none; }
+.flow:hover { border-color: var(--line-2); }
+.flow.on { border-color: var(--accent); background: var(--accent-soft); }
+.flow:has(input:focus-visible) { box-shadow: 0 0 0 3px var(--accent-soft); border-color: var(--accent); }
+
+.flow-icon { font-size: 19px; line-height: 1.2; flex: none; }
+.flow-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.flow-label { font-size: 14.5px; font-weight: 500; letter-spacing: -0.02em; }
+.flow-desc { font-size: 12.5px; color: var(--muted); line-height: 1.45; }
+
+.flow-mark {
+  position: absolute; top: 13px; right: 14px;
+  width: 19px; height: 19px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: 11px; color: #fff; background: var(--accent);
+  opacity: 0; transform: scale(0.6);
+  transition: opacity 0.16s ease, transform 0.16s ease;
+}
+.flow.on .flow-mark { opacity: 1; transform: none; }
+
+.flow-tag {
+  padding: 2px 9px; border-radius: var(--r-pill);
+  font-size: 11px; font-weight: 500; border: 1px solid;
+}
+.ft-audit { color: var(--c-url); background: color-mix(in srgb, var(--c-url) 9%, #fff); border-color: color-mix(in srgb, var(--c-url) 26%, #fff); }
+.ft-write { color: var(--c-content); background: color-mix(in srgb, var(--c-content) 9%, #fff); border-color: color-mix(in srgb, var(--c-content) 26%, #fff); }
+
 .new-grid {
   display: grid;
   gap: 18px 20px;
@@ -187,7 +268,54 @@ onMounted(load);
 }
 .submit-cell { grid-column: 1 / -1; }
 @media (max-width: 720px) {
-  .new-grid { grid-template-columns: 1fr; grid-template-areas: 't' 'k' 'u'; }
+  .sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+.flows {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  border: 0; padding: 0; margin: 0 0 22px;
+}
+@media (max-width: 720px) { .flows { grid-template-columns: 1fr; } }
+
+.flow {
+  position: relative;
+  display: flex; align-items: flex-start; gap: 13px;
+  padding: 16px 17px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  cursor: pointer;
+  transition: border-color 0.16s ease, background 0.16s ease, box-shadow 0.16s ease;
+}
+.flow input { position: absolute; opacity: 0; pointer-events: none; }
+.flow:hover { border-color: var(--line-2); }
+.flow.on { border-color: var(--accent); background: var(--accent-soft); }
+.flow:has(input:focus-visible) { box-shadow: 0 0 0 3px var(--accent-soft); border-color: var(--accent); }
+
+.flow-icon { font-size: 19px; line-height: 1.2; flex: none; }
+.flow-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.flow-label { font-size: 14.5px; font-weight: 500; letter-spacing: -0.02em; }
+.flow-desc { font-size: 12.5px; color: var(--muted); line-height: 1.45; }
+
+.flow-mark {
+  position: absolute; top: 13px; right: 14px;
+  width: 19px; height: 19px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: 11px; color: #fff; background: var(--accent);
+  opacity: 0; transform: scale(0.6);
+  transition: opacity 0.16s ease, transform 0.16s ease;
+}
+.flow.on .flow-mark { opacity: 1; transform: none; }
+
+.flow-tag {
+  padding: 2px 9px; border-radius: var(--r-pill);
+  font-size: 11px; font-weight: 500; border: 1px solid;
+}
+.ft-audit { color: var(--c-url); background: color-mix(in srgb, var(--c-url) 9%, #fff); border-color: color-mix(in srgb, var(--c-url) 26%, #fff); }
+.ft-write { color: var(--c-content); background: color-mix(in srgb, var(--c-content) 9%, #fff); border-color: color-mix(in srgb, var(--c-content) 26%, #fff); }
+
+.new-grid { grid-template-columns: 1fr; grid-template-areas: 't' 'k' 'u'; }
 }
 
 .list-head { margin-bottom: 18px; align-items: center; }

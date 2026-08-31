@@ -1,11 +1,23 @@
 /** İnce API istemcisi. Hata mesajlarını sunucudan olduğu gibi taşır. */
+
+/** Oturum düştüğünde tetiklenir; yönlendirici giriş ekranına atar. */
+let onUnauthorized = () => {};
+export const setUnauthorizedHandler = (fn) => { onUnauthorized = fn; };
+
 async function request(path, options = {}) {
   const res = await fetch(`/api${path}`, {
     headers: { 'Content-Type': 'application/json' },
+    credentials: 'same-origin',
     ...options,
     body: options.body ? JSON.stringify(options.body) : undefined,
   });
+
+  if (res.status === 401 && !path.startsWith('/auth')) {
+    onUnauthorized();
+    throw new Error('Oturumun sona erdi, tekrar giriş yap.');
+  }
   if (res.status === 204) return null;
+
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data.error || `Sunucu hatası (${res.status})`);
   return data;
@@ -13,7 +25,13 @@ async function request(path, options = {}) {
 
 export const api = {
   health:     ()             => request('/health'),
-  checklist:  ()             => request('/checklist'),
+
+  me:         ()             => request('/auth/me'),
+  login:      (password)     => request('/auth/login', { method: 'POST', body: { password } }),
+  logout:     ()             => request('/auth/logout', { method: 'POST' }),
+
+  /** list: 'audit' (varsayılan) ya da 'write' */
+  checklist:  (list = 'audit') => request(`/checklist?list=${encodeURIComponent(list)}`),
 
   listPosts:  (params = {})  => request(`/posts?${new URLSearchParams(params)}`),
   getPost:    (id)           => request(`/posts/${id}`),

@@ -5,8 +5,11 @@ import ChecklistItem from '../components/ChecklistItem.vue';
 
 const props = defineProps({ id: { type: [String, Number], required: true } });
 
-const categories = ref([]);
-const items = ref([]);
+// Her iki kontrol listesi ayrı ayrı tutulur: 'audit' (yayındaki sayfayı ölçer)
+// ve 'write' (sıfırdan yazarken izlenir). Yazım akışındaki bir kayıtta ikisi de
+// yüklenir; kullanıcı sekmelerle geçiş yapar.
+const lists = ref({});           // 'audit' | 'write' -> { categories, items }
+const activeList = ref('audit');
 const post = ref(null);
 const checks = ref({});          // code -> post_checks satırı
 const findings = ref({});        // code -> bulgu
@@ -20,6 +23,11 @@ const error = ref('');
 const busyCodes = ref(new Set());
 const showOnly = ref('all');     // all | problems | manual
 
+const categories = computed(() => lists.value[activeList.value]?.categories || []);
+const items = computed(() => lists.value[activeList.value]?.items || []);
+const isWriteList = computed(() => activeList.value === 'write');
+const hasBothLists = computed(() => post.value?.flow === 'write');
+
 const STATUS_OPTS = [
   { v: 'draft', l: 'Taslak' },
   { v: 'review', l: 'Kontrolde' },
@@ -27,16 +35,32 @@ const STATUS_OPTS = [
 ];
 
 // ─────────────────────── veri ───────────────────────
+let loadedPostId = null;
+
 async function load() {
   loading.value = true;
   try {
-    const [def, detail] = await Promise.all([api.checklist(), api.getPost(props.id)]);
-    categories.value = def.categories;
-    items.value = def.items;
+    const detail = await api.getPost(props.id);
     post.value = detail.post;
     checks.value = Object.fromEntries(detail.checks.map((c) => [c.item_code, c]));
     audit.value = detail.audit;
     findings.value = Object.fromEntries(detail.findings.map((f) => [f.item_code, f]));
+
+    // Yazım akışında iki liste de gerekir; denetim akışında yalnızca biri.
+    const needed = detail.post.flow === 'write' ? ['write', 'audit'] : ['audit'];
+    const loaded = await Promise.all(needed.map((l) => api.checklist(l)));
+    lists.value = Object.fromEntries(loaded.map((d) => [d.list, { categories: d.categories, items: d.items }]));
+
+    // Yeni bir kayıt açıldığında sekme, akışın doğal başlangıcına ayarlanır:
+    // yazım akışı yazım listesiyle açılır. Aynı kayıt yeniden yüklenirken
+    // (örneğin kaydetme hatasından sonra) kullanıcının seçtiği sekme korunur.
+    if (loadedPostId !== detail.post.id) {
+      activeList.value = needed[0];
+      loadedPostId = detail.post.id;
+    } else if (!lists.value[activeList.value]) {
+      activeList.value = needed[0];
+    }
+
     error.value = '';
   } catch (err) {
     error.value = err.message;
@@ -46,6 +70,7 @@ async function load() {
 }
 onMounted(load);
 watch(() => props.id, load);
+watch(activeList, () => { showOnly.value = 'all'; });
 
 // ─────────────────────── eylemler ───────────────────────
 async function runAudit() {
@@ -63,6 +88,8 @@ async function runAudit() {
     lastRun.value = r;
     findings.value = Object.fromEntries(r.findings.filter((f) => f.status !== 'manual').map((f) => [f.code, f]));
     audit.value = { score: r.score, created_at: new Date().toISOString().slice(0, 16).replace('T', ' ') };
+    // Denetim sonucunu görmesi için otomatik olarak denetim sekmesine geç.
+    if (lists.value.audit) activeList.value = 'audit';
   } catch (err) {
     error.value = err.message;
   } finally {
@@ -134,9 +161,24 @@ const blockers = computed(() =>
   })
 );
 
-const ready = computed(() => !!audit.value && blockers.value.length === 0);
+const ready = computed(() =>
+  isWriteList.value
+    ? blockers.value.length === 0
+    : !!audit.value && blockers.value.length === 0
+);
 
-const score = computed(() => lastRun.value?.score ?? audit.value?.score ?? null);
+/** Yazım listesinde skor, ağırlıklı tamamlanma yüzdesidir. */
+const writeScore = computed(() => {
+  const all = items.value;
+  if (!all.length) return null;
+  const total = all.reduce((n, i) => n + (i.weight || 1), 0);
+  const done = all.reduce((n, i) => n + (checks.value[i.code]?.is_checked ? (i.weight || 1) : 0), 0);
+  return Math.round((done / total) * 100);
+});
+
+const score = computed(() =>
+  isWriteList.value ? writeScore.value : (lastRun.value?.score ?? audit.value?.score ?? null)
+);
 const scoreClass = computed(() =>
   score.value === null ? 'none' : score.value >= 85 ? 'good' : score.value >= 65 ? 'mid' : 'bad'
 );
@@ -213,7 +255,10 @@ function catStat(cat) {
             {{ auditing ? 'Denetleniyor…' : 'Kontrol Et' }}
             <span class="btn-arrow" aria-hidden="true">&#8594;</span>
           </button>
-          <span class="saved">
+          <span v-if="hasBothLists && !post.url" class="saved hint">
+            Yazıyı yayınlayıp adresini yukarıya girince denetim çalıştırılabilir.
+          </span>
+          <span v-else class="saved">
             <template v-if="saving">kaydediliyor…</template>
             <template v-else-if="audit?.created_at">son denetim {{ String(audit.created_at).slice(0, 16) }}</template>
             <template v-else>henüz denetlenmedi</template>
@@ -227,34 +272,67 @@ function catStat(cat) {
           <div class="ring-in">
             <span v-if="score !== null" class="ring-num">{{ score }}</span>
             <span v-else class="ring-num dim">&ndash;</span>
-            <span class="ring-cap">skor</span>
+            <span class="ring-cap">{{ isWriteList ? 'tamam' : 'skor' }}</span>
           </div>
         </div>
         <ul class="tallies">
-          <li><i class="d d-pass"></i>{{ summary.pass }} geçti</li>
-          <li><i class="d d-warn"></i>{{ summary.warn }} uyarı</li>
-          <li><i class="d d-fail"></i>{{ summary.fail }} hata</li>
-          <li><i class="d d-wait"></i>{{ summary.manual + summary.pending }} bekliyor</li>
+          <template v-if="isWriteList">
+            <li><i class="d d-pass"></i>{{ summary.pass }} tamamlandı</li>
+            <li><i class="d d-wait"></i>{{ summary.manual + summary.pending }} kaldı</li>
+          </template>
+          <template v-else>
+            <li><i class="d d-pass"></i>{{ summary.pass }} geçti</li>
+            <li><i class="d d-warn"></i>{{ summary.warn }} uyarı</li>
+            <li><i class="d d-fail"></i>{{ summary.fail }} hata</li>
+            <li><i class="d d-wait"></i>{{ summary.manual + summary.pending }} bekliyor</li>
+          </template>
         </ul>
       </aside>
     </section>
 
     <p v-if="error" class="notice">{{ error }}</p>
 
+    <!-- ───────── liste sekmeleri (yalnızca yazım akışında) ───────── -->
+    <div v-if="hasBothLists" class="tabs" role="tablist">
+      <button
+        class="tab" :class="{ on: activeList === 'write' }"
+        role="tab" :aria-selected="activeList === 'write'"
+        @click="activeList = 'write'"
+      >
+        <span class="tab-icon">✍️</span> Yazım listesi
+        <span class="tab-n">{{ lists.write?.items.length || 0 }}</span>
+      </button>
+      <button
+        class="tab" :class="{ on: activeList === 'audit' }"
+        role="tab" :aria-selected="activeList === 'audit'"
+        @click="activeList = 'audit'"
+      >
+        <span class="tab-icon">🔎</span> Sayfa denetimi
+        <span class="tab-n">{{ lists.audit?.items.length || 0 }}</span>
+      </button>
+    </div>
+
     <!-- ───────── yayın kapısı ───────── -->
     <section class="gate" :class="ready ? 'gate-ok' : 'gate-block'">
       <div class="gate-tag">
-        <span class="gate-led"></span>{{ ready ? 'Yayına hazır' : 'Yayınlama' }}
+        <span class="gate-led"></span>{{ ready ? (isWriteList ? 'Yazım tamam' : 'Yayına hazır') : 'Yayınlama' }}
       </div>
       <div class="gate-body">
         <template v-if="ready">
-          <p class="gate-lead">Kritik maddelerin tamamı temiz. Yayınlayabilirsin.</p>
+          <p v-if="isWriteList" class="gate-lead">
+            Yazım listesindeki kritik adımların tamamı tamam. Yayınla, sonra
+            <strong>Sayfa denetimi</strong> sekmesinden ölçümü çalıştır.
+          </p>
+          <p v-else class="gate-lead">Kritik maddelerin tamamı temiz. Yayınlayabilirsin.</p>
         </template>
-        <template v-else-if="!audit">
+        <template v-else-if="!isWriteList && !audit">
           <p class="gate-lead">Önce <strong>Kontrol Et</strong>&#8217;e bas. Denetim çalıştırılmadan yayın onayı verilmez.</p>
         </template>
         <template v-else>
-          <p class="gate-lead"><strong>{{ blockers.length }} kritik madde açık.</strong> Bunlar kapanmadan yayınlama.</p>
+          <p class="gate-lead">
+            <strong>{{ blockers.length }} kritik adım açık.</strong>
+            {{ isWriteList ? 'Bunları tamamlamadan yazıyı yayınlama.' : 'Bunlar kapanmadan yayınlama.' }}
+          </p>
           <ul class="gate-list">
             <li v-for="b in blockers" :key="b.code">
               <span class="mono gcode">{{ b.code }}</span>
@@ -272,11 +350,15 @@ function catStat(cat) {
       <button class="pill" :class="{ on: showOnly === 'all' }" @click="showOnly = 'all'">
         Tümü <span>{{ items.length }}</span>
       </button>
-      <button class="pill pill-problems" :class="{ on: showOnly === 'problems' }" @click="showOnly = 'problems'">
+      <button
+        v-if="!isWriteList"
+        class="pill pill-problems" :class="{ on: showOnly === 'problems' }"
+        @click="showOnly = 'problems'"
+      >
         Sorunlular <span>{{ summary.fail + summary.warn }}</span>
       </button>
       <button class="pill pill-manual" :class="{ on: showOnly === 'manual' }" @click="showOnly = 'manual'">
-        Elle işaretlenecek <span>{{ summary.manual }}</span>
+        {{ isWriteList ? 'Kalanlar' : 'Elle işaretlenecek' }} <span>{{ summary.manual }}</span>
       </button>
     </div>
 
@@ -393,7 +475,38 @@ function catStat(cat) {
   .panel-score { flex-direction: row; justify-content: flex-start; gap: 24px; }
 }
 
-/* ───── yayin kapisi ───── */
+/* ───── liste sekmeleri ───── */
+.tabs {
+  display: flex; gap: 6px;
+  padding: 5px;
+  margin-bottom: 26px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  width: fit-content; max-width: 100%;
+  background: var(--surface);
+}
+.tab {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 18px;
+  border: 0; border-radius: var(--r-pill);
+  background: transparent; color: var(--muted);
+  font-family: inherit; font-size: 14px; font-weight: 500; letter-spacing: -0.015em;
+  white-space: nowrap;
+  transition: background 0.16s ease, color 0.16s ease, box-shadow 0.16s ease;
+}
+.tab:hover { color: var(--ink); }
+.tab.on { background: var(--bg); color: var(--ink); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.07); }
+.tab-icon { font-size: 14px; }
+.tab-n { font-size: 12px; color: var(--muted); }
+.tab.on .tab-n { color: var(--accent); }
+@media (max-width: 560px) {
+  .tabs { width: 100%; }
+  .tab { flex: 1; justify-content: center; padding: 9px 10px; font-size: 13px; }
+}
+
+.hint { max-width: 320px; line-height: 1.45; }
+
+/* ───── yayın kapısı ───── */
 .gate {
   display: flex; gap: 26px; align-items: flex-start;
   padding: 24px 28px; margin-bottom: 44px;

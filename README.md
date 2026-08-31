@@ -1,11 +1,20 @@
 # SEO Kontrol Listesi
 
-WordPress'e yazı giren editörün **yayından önce** geçmesi gereken 58 maddelik kontrol listesi
-ve bu maddelerin büyük kısmını otomatik ölçen bir denetim motoru.
+WordPress'e yazı giren editör için iki kontrol listesi ve bu listelerin büyük kısmını otomatik
+ölçen bir denetim motoru.
 
-Editör "Kontrol Et"e basar; uygulama sayfayı gerçekten indirir, ayrıştırır ve maddeleri tek tek
-değerlendirir. Sonuç bir skor ve bir **yayın kapısı**dır: kritik maddeler kapanmadan yazı yayına
-gitmez.
+Kayıt açarken iki çalışma biçiminden biri seçilir:
+
+| Biçim | Ne zaman | Ne yapar |
+| --- | --- | --- |
+| 🔎 **Var olan içeriğimi kontrol et** | Sayfa yayında | Adres verilir, 58 maddenin 47'si otomatik ölçülür |
+| ✍️ **Sıfırdan içerik yazıyorum** | Yazı henüz yok | 36 adımlık yazım listesi; editör yaptıkça işaretler |
+
+Yazım akışıyla açılan bir kayıtta iki liste de bulunur. Editör önce yazım listesini takip ederek
+içeriği üretir; yayınladıktan sonra adresi girip **Sayfa denetimi** sekmesinden ölçümü çalıştırır.
+
+Her iki listede de sonuç bir skor ve bir **yayın kapısı**dır: kritik maddeler kapanmadan yazı
+yayına gitmez.
 
 ---
 
@@ -30,6 +39,9 @@ işaretlemeye çalışan istek 409 ile reddedilir.
 Editörün işaretleyeceği 11 madde ise gerçekten dışarıdan ölçülemeyen şeylerdir: içeriğin
 özgünlüğü, eski bir yazıdan bağlantı verilmesi, Search Console'a gönderim, son okuma.
 
+Yazım listesinin 36 adımının tamamı elle işaretlenir; bu bir istisna değil, zorunluluktur:
+o aşamada ortada ölçülecek bir sayfa henüz yoktur.
+
 İkinci karar: **ölçülebilen hiçbir şey yapay zekâya bırakılmadı.** Model karakter saymaz, `<h3>`
 saymaz. Yalnızca yorum gerektiren 7 maddede çalışır: meta açıklamanın ikna gücü, alt başlıkların
 anlamlılığı, imla, alıntılanabilir özet paragrafı. Bu sayede Gemini anahtarı olmasa bile denetimin
@@ -45,16 +57,28 @@ Gereksinimler: **Node.js 20+**, **MySQL 8+**
 git clone https://github.com/burhanemreuzun/seochecklist.git
 cd seochecklist
 cp .env.example .env      # ayarları doldur
-npm run setup             # bağımlılıklar, veritabanı ve 58 madde
+npm run setup             # bağımlılıklar, veritabanı ve 94 madde
 ```
+
+Giriş parolasını belirle:
+
+```bash
+npm run set-password "seçtiğin parola"
+```
+
+Bu komut parolanın **scrypt özetini** `.env` dosyasına yazar ve `SESSION_SECRET` yoksa rastgele
+üretir. Parola hiçbir zaman kaynak koda ya da depoya girmez.
 
 `.env` içinde en az şunları ayarla:
 
 ```ini
 DB_USER=root
-DB_PASSWORD=parolan
+DB_PASSWORD=veritabani-parolan
 GEMINI_API_KEY=...        # boş bırakılabilir; o zaman 7 yapay zekâ maddesi atlanır
 ```
+
+`APP_PASSWORD_HASH` ve `SESSION_SECRET` alanlarını elle doldurma; yukarıdaki
+`set-password` komutu ikisini de yazar.
 
 Gemini anahtarı: <https://aistudio.google.com/apikey>
 
@@ -84,12 +108,24 @@ Tek sunucu hem API'yi hem de derlenmiş arayüzü <http://localhost:3001> adresi
 
 ## Kullanım
 
-1. **Kayıt aç** — yazı başlığı, odak anahtar kelime, adres.
-2. **Yaz ve yayınla** (ya da önizleme adresini kullan).
-3. **Kontrol Et** — sayfa indirilir, 47 madde otomatik değerlendirilir.
-4. **Kırmızı maddeleri düzelt**, tekrar kontrol et.
-5. **Elle işaretlenecek 11 maddeyi** kontrol edip işaretle.
-6. Yayın kapısı yeşile dönünce yayınla.
+Uygulama parola ister; oturum çerezi 30 gün geçerlidir.
+
+### Var olan içeriği denetlerken
+
+1. **Kayıt aç** — biçim olarak "Var olan içeriğimi kontrol et" seç; başlık, odak kelime ve adres gir.
+2. **Kontrol Et** — sayfa indirilir, 47 madde otomatik değerlendirilir.
+3. **Kırmızı maddeleri düzelt**, tekrar kontrol et.
+4. **Elle işaretlenecek 11 maddeyi** kontrol edip işaretle.
+5. Yayın kapısı yeşile dönünce yayınla.
+
+### Sıfırdan yazarken
+
+1. **Kayıt aç** — biçim olarak "Sıfırdan içerik yazıyorum" seç.
+2. **Yazım listesini** yukarıdan aşağı takip et: araştırma → kurgu → yazım → görsel ve bağlantı →
+   yayın hazırlığı. Her adımı yaptıkça işaretle; ilerleme halkası doldukça görünür.
+3. Kritik adımlar kapanınca kapı "Yazım tamam"a döner. Yazıyı yayınla.
+4. Adresi kayda gir ve **Sayfa denetimi** sekmesine geç, **Kontrol Et**'e bas.
+5. Ölçüm sonuçlarına göre düzelt.
 
 ### Terminalden hızlı denetim
 
@@ -106,22 +142,25 @@ npm run check https://siteadi.com/yazi-adresi/ "odak anahtar kelime"
 ## Mimari
 
 ```
-client/                Vue 3 + Vite arayuz
-  src/assets/main.css  tasarim sistemi (Inter Tight · pill formlar · duz yuzeyler)
-  src/views/           PostsView (liste) · PostView (kontrol tezgahi)
+client/                Vue 3 + Vite arayüz
+  src/assets/main.css  tasarım sistemi (Inter Tight, pill formlar, kategori renkleri)
+  src/lib/session.js   oturum durumu önbelleği
+  src/views/           LoginView · PostsView (liste) · PostView (kontrol tezgâhı)
   src/components/      ChecklistItem
 server/
+  src/auth.js          parola özeti, imzalı oturum çerezi, deneme sınırı
   src/audit/
     fetch.js           sayfa indirme, bağlantı ve görsel yoklama (HEAD)
-    extract.js         HTML → yapisal olgular (cheerio)
+    extract.js         HTML → yapısal olgular (cheerio)
     rules.js           40 deterministik kural
     ai.js              7 madde · Gemini (gemini-3.7-flash)
-    index.js           orkestrasyon + skorlama
+    index.js           orkestrasyon ve skorlama
   src/db/
-    checklist.seed.js  ★ 58 maddenin tek dogruluk kaynagi
-    schema.sql         MySQL semasi
+    checklist.seed.js  ★ 58 denetim maddesinin tek doğruluk kaynağı
+    writing.seed.js    ★ 36 yazım adımının tek doğruluk kaynağı
+    schema.sql         MySQL şeması
   src/routes/          REST API
-docs/CHECKLIST.md      yazdirilabilir liste (seed'den uretilir)
+docs/CHECKLIST.md      yazdırılabilir liste (iki seed dosyasından üretilir)
 ```
 
 ### Skorlama
@@ -134,9 +173,24 @@ diye hesaba katılmaz; onlar yayın kapısında denetlenir.
 işaretlenmemişse kapı kırmızı kalır. 90 puan alıp yine de yayınlayamayabilirsin — kritik bir madde
 açıkken skorun yüksek olması bir şey ifade etmez.
 
+### Güvenlik
+
+- Parola düz metin olarak hiçbir yerde tutulmaz; `.env` içinde yalnızca scrypt özeti bulunur ve
+  `.env` sürüm kontrolüne girmez.
+- Karşılaştırma zamanlama saldırısına kapalıdır (`timingSafeEqual`).
+- Oturum çerezi HMAC ile imzalanır ve `httpOnly` olduğu için JavaScript okuyamaz.
+- Hatalı parola denemeleri IP başına 15 dakikada 10 ile sınırlıdır.
+- `/api/health`, `/api/auth/*` dışındaki tüm uçlar oturum ister.
+- HTTPS arkasında çalıştırırken `.env` içinde `NODE_ENV=production` ve `HTTPS=true` ayarla; çerez
+  o zaman `Secure` bayrağıyla gönderilir.
+
+Parolayı değiştirmek için `npm run set-password "yeni parola"` çalıştırıp sunucuyu yeniden başlat.
+Bu, açık olan tüm oturumları geçersiz kılmaz; oturumları da düşürmek istiyorsan `.env` içindeki
+`SESSION_SECRET` değerini sil ve komutu tekrar çalıştır.
+
 ### Madde ekleme ve değiştirme
 
-Tek dosya: `server/src/db/checklist.seed.js`
+Denetim listesi: `server/src/db/checklist.seed.js` · Yazım listesi: `server/src/db/writing.seed.js`
 
 ```bash
 npm run db:seed                        # veritabanına uygula
@@ -156,7 +210,10 @@ Yeni bir `rule` maddesi eklersen `rules.js` içine aynı kodla bir fonksiyon yaz
 | Yöntem | Adres | Açıklama |
 | --- | --- | --- |
 | `GET` | `/api/health` | Veritabanı ve yapay zekâ durumu |
-| `GET` | `/api/checklist` | Kategoriler ve maddeler |
+| `POST` | `/api/auth/login` | Parolayla giriş, oturum çerezi verir |
+| `POST` | `/api/auth/logout` | Oturumu kapatır |
+| `GET` | `/api/auth/me` | Oturum açık mı |
+| `GET` | `/api/checklist?list=` | Kategoriler ve maddeler (`audit` ya da `write`) |
 | `GET` | `/api/posts` | Yazı listesi (`?status=`, `?q=`) |
 | `POST` | `/api/posts` | Yazı kaydı aç |
 | `GET` | `/api/posts/:id` | Yazı, işaretler ve son denetim |
@@ -178,3 +235,5 @@ Yeni bir `rule` maddesi eklersen `rules.js` içine aynı kodla bir fonksiyon yaz
   gerektirdiği için elle işaretlenir.
 - Sayfa hızı (`TEC_07`) PageSpeed Insights'a bırakıldı, entegre edilmedi.
 - Arayüzde koyu tema yok.
+- Tek parolalı giriş vardır; kullanıcı hesabı, rol ayrımı ve kim ne yaptı kaydı yoktur.
+  Kimin işaretlediği yalnızca üst çubuğa yazılan isimden alınır ve doğrulanmaz.

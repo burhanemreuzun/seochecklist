@@ -1,13 +1,27 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { api, editorName } from './lib/api.js';
+import { session } from './lib/session.js';
 
+const route = useRoute();
+const router = useRouter();
 const health = ref(null);
 const editor = ref(editorName.get());
+
+// Giriş ekranında üst çubuk gösterilmez.
+const chrome = computed(() => route.name !== 'login');
 
 onMounted(async () => {
   try { health.value = await api.health(); } catch { health.value = { ok: false }; }
 });
+
+async function logout() {
+  try { await api.logout(); } finally {
+    session.set(false);
+    router.replace({ name: 'login' });
+  }
+}
 
 function saveEditor(e) {
   editor.value = e.target.value;
@@ -18,7 +32,7 @@ function saveEditor(e) {
 <template>
   <div class="page">
     <!-- yüzen gezinme çubuğu -->
-    <div class="navwrap">
+    <div v-if="chrome" class="navwrap">
       <nav class="nav">
         <RouterLink to="/" class="brand">SEO Kontrol<span class="dot">.</span></RouterLink>
 
@@ -36,11 +50,12 @@ function saveEditor(e) {
             aria-label="Editör adı"
             @input="saveEditor"
           />
+          <button class="out" type="button" title="Çıkış yap" @click="logout">Çıkış</button>
         </div>
       </nav>
     </div>
 
-    <main class="shell">
+    <main :class="chrome ? 'shell' : ''">
       <RouterView />
     </main>
   </div>
@@ -97,10 +112,23 @@ function saveEditor(e) {
 .who::placeholder { color: #b3b3b3; }
 .who:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 
+.out {
+  padding: 8px 15px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--muted);
+  font-family: inherit; font-size: 13px; font-weight: 500;
+  letter-spacing: -0.01em;
+  transition: color 0.16s ease, border-color 0.16s ease, background 0.16s ease;
+}
+.out:hover { color: var(--fail); border-color: var(--fail-line); background: var(--fail-soft); }
+
 @media (max-width: 640px) {
   .navwrap { padding: 12px 16px 20px; }
   .nav { padding: 8px 8px 8px 18px; }
   .state-txt { display: none; }
-  .who { width: 96px; }
+  .who { width: 88px; }
+  .out { padding: 8px 12px; }
 }
 </style>
