@@ -4,18 +4,22 @@
   "private": true,
   "description": "WordPress yazilari icin yayin oncesi SEO kontrol listesi - kural motoru + Gemini destekli otomatik denetim",
   "scripts": {
-    "setup": "npm --prefix server install && npm --prefix client install && npm run db:setup",
-    "db:setup": "npm --prefix server run db:setup",
-    "db:seed": "npm --prefix server run db:seed",
-    "dev:server": "npm --prefix server run dev",
-    "dev:client": "npm --prefix client run dev",
-    "build": "npm --prefix client run build",
-    "hosting:build": "npm ci --prefix server --omit=dev && npm ci --prefix client && npm run build",
-    "start": "npm --prefix server start",
+    "setup": "npm install && npm run db:setup",
+    "db:setup": "node server/src/db/migrate.js && node server/src/db/seed.js",
+    "db:seed": "node server/src/db/seed.js",
+    "dev:server": "node --watch server/src/index.js",
+    "dev:client": "npm run dev --workspace client",
+    "build": "npm run build --workspace client",
+    "hosting:build": "npm install && npm run build",
+    "start": "node server/src/index.js",
     "check": "node server/src/cli.js",
-    "set-password": "npm --prefix server run set-password --"
+    "set-password": "node server/src/set-password.js"
   },
   "engines": {
     "node": ">=20"
-  }
+  },
+  "workspaces": [
+    "client",
+    "server"
+  ]
 }

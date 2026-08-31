@@ -60,6 +60,9 @@ cp .env.example .env      # ayarları doldur
 npm run setup             # bağımlılıklar, veritabanı ve 93 madde
 ```
 
+Proje npm workspaces kullanır; kökteki tek `npm install` her iki paketi de kurar,
+alt klasörlerde ayrıca kurulum yapman gerekmez.
+
 Giriş parolasını belirle:
 
 ```bash
@@ -225,9 +228,15 @@ Depoyu GitHub üzerinden içe aktaran panellerde (Hostinger Web Apps ve benzerle
 | Giriş dosyası | `server/src/index.js` |
 | Çıktı dizini | boş bırak |
 
-`hosting:build`, iki çalışma alanının bağımlılıklarını kurup arayüzü derler.
+Proje npm workspaces kullanır: kökte tek bir `npm install`, hem `client` hem
+`server` bağımlılıklarını kurar ve hepsini kök `node_modules` altında toplar.
+Bu yüzden panelin hangi kurulum komutunu çalıştırdığı önemli değildir.
+`hosting:build` kurulum ve derlemeyi birlikte yapar; kurulum zaten yapılmışsa
+ikinci kez çalışması zarar vermez.
+
 Çıktı dizini boş bırakılır çünkü derlenmiş arayüzü panelin statik sunucusu değil,
-Express'in kendisi servis eder.
+Express'in kendisi servis eder. Oraya `client/dist` yazılırsa `/giris`, `/yazi/3`
+gibi tek sayfa uygulama yolları 404 döner.
 
 Sunucu `PORT` değişkenini kullanır; platform kendi portunu verir, elle ayarlama.
 
