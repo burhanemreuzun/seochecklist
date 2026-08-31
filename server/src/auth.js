@@ -96,7 +96,16 @@ function readCookie(req, name) {
   return null;
 }
 
-function setSessionCookie(res, token) {
+/**
+ * Oturum çerezini yazar.
+ *
+ * `Secure` bayrağı ortam değişkenine değil, isteğin kendisine bakılarak eklenir:
+ * Express `trust proxy` açık olduğu için `req.secure`, ters vekil sunucunun
+ * gönderdiği X-Forwarded-Proto başlığını da hesaba katar. Böylece HTTPS
+ * arkasında bayrak kendiliğinden açılır, localhost'ta ise açılmaz; unutulan bir
+ * ayar yüzünden giriş sessizce bozulmaz.
+ */
+function setSessionCookie(req, res, token) {
   const parts = [
     `${COOKIE}=${token}`,
     'Path=/',
@@ -104,8 +113,7 @@ function setSessionCookie(res, token) {
     'SameSite=Lax',
     `Max-Age=${SESSION_DAYS * 86400}`,
   ];
-  // Secure yalnızca HTTPS'te anlamlı; localhost'ta çerezi engellerdi.
-  if (process.env.NODE_ENV === 'production' && process.env.HTTPS === 'true') parts.push('Secure');
+  if (req.secure) parts.push('Secure');
   res.setHeader('Set-Cookie', parts.join('; '));
 }
 

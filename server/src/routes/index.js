@@ -112,7 +112,7 @@ router.post('/auth/login', wrap(async (req, res) => {
   }
 
   auth.resetRateLimit(ip);
-  auth.setSessionCookie(res, auth.issueToken());
+  auth.setSessionCookie(req, res, auth.issueToken());
   res.json({ ok: true });
 }));
 

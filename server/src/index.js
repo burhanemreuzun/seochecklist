@@ -39,7 +39,30 @@ if (!process.env.APP_PASSWORD_HASH) {
   console.warn('⚠ APP_PASSWORD_HASH tanımlı değil — giriş yapılamaz. `npm run set-password "parola"` çalıştır.');
 }
 
+/**
+ * Kabuk erişimi olmayan sunucularda (paylaşımlı hosting, otomatik dağıtım)
+ * tabloların ve maddelerin kurulmasını sağlar. Her iki işlem de yinelenebilir:
+ * tablo varsa dokunmaz, madde varsa günceller.
+ * Veritabanına ulaşılamazsa sunucu yine de ayağa kalkar; durum /api/health'te görünür.
+ */
+async function autoMigrate() {
+  if (process.env.AUTO_MIGRATE !== 'true') return;
+  const { execFile } = require('child_process');
+  const { promisify } = require('util');
+  const run = promisify(execFile);
+  for (const script of ['db/migrate.js', 'db/seed.js']) {
+    try {
+      const { stdout } = await run(process.execPath, [path.join(__dirname, script)], { timeout: 60000 });
+      process.stdout.write(stdout);
+    } catch (err) {
+      console.error(`⚠ Otomatik kurulum adımı başarısız (${script}):`, err.stderr || err.message);
+    }
+  }
+}
+
+autoMigrate().finally(() => {
 app.listen(PORT, () => {
   console.log(`▶ SEO Kontrol Listesi API  http://localhost:${PORT}`);
   console.log(`  Yapay zekâ: ${process.env.GEMINI_API_KEY ? (process.env.GEMINI_MODEL || 'gemini-3.7-flash') : 'kapalı (GEMINI_API_KEY tanımlı değil)'}`);
+});
 });

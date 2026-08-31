@@ -205,6 +205,64 @@ Yeni bir `rule` maddesi eklersen `rules.js` içine aynı kodla bir fonksiyon yaz
 
 ---
 
+## Sunucuya dağıtım
+
+Uygulama tek bir Node süreci olarak çalışır: derlenmiş Vue arayüzünü ve API'yi
+aynı porttan verir. Ayrıca **bir MySQL veritabanına ihtiyaç duyar**; bunu hosting
+panelinden ayrıca açman ve bilgilerini ortam değişkeni olarak girmen gerekir.
+
+### Derleme ve başlatma
+
+```bash
+npm ci --prefix server --omit=dev && npm ci --prefix client && npm run build
+```
+
+```bash
+npm start
+```
+
+Sunucu `PORT` değişkenini kullanır; platform kendi portunu verir, elle ayarlama.
+Kök dizin deponun kökü (`./`) olmalı. Node 20 ve üstü gerekir.
+
+### Ortam değişkenleri
+
+| Değişken | Zorunlu | Açıklama |
+| --- | --- | --- |
+| `DB_HOST` `DB_PORT` `DB_USER` `DB_PASSWORD` `DB_NAME` | evet | Hosting panelinden açtığın MySQL veritabanı |
+| `APP_PASSWORD_HASH` | evet | Giriş parolasının scrypt özeti — yerel `.env` dosyandan kopyala |
+| `SESSION_SECRET` | evet | Oturum imzalama anahtarı — yerel `.env` dosyandan kopyala |
+| `AUTO_MIGRATE` | ilk açılışta | `true` yaparsan tablolar ve maddeler açılışta kurulur |
+| `GEMINI_API_KEY` | hayır | Boşsa 7 yapay zekâ maddesi atlanır, kural motoru çalışır |
+| `GEMINI_MODEL` | hayır | Varsayılan `gemini-3.7-flash` |
+| `NODE_ENV` | hayır | `production` |
+
+`APP_PASSWORD_HASH` ve `SESSION_SECRET` değerlerini panele yazmak için yerel
+dosyandan oku:
+
+```bash
+grep -E '^(APP_PASSWORD_HASH|SESSION_SECRET|GEMINI_API_KEY)=' .env
+```
+
+Bu iki değeri elle uydurma; `set-password` komutunun ürettiklerini kullan.
+Sunucuda `.env` dosyası bulunmaz, değerler platformun ortam değişkenlerinden okunur.
+
+### İlk açılış
+
+`AUTO_MIGRATE=true` ile başlat: tablolar oluşturulur ve 93 madde yüklenir. Her
+iki işlem de yinelenebilir olduğu için değişkeni açık bırakmak zarar vermez;
+her yeniden dağıtımda madde metinleri de güncellenmiş olur.
+
+Veritabanına ulaşılamazsa sunucu yine de açılır ve `/api/health` `"database":
+"kapalı"` döndürür; sorunu oradan görebilirsin.
+
+### HTTPS
+
+Oturum çerezi, isteğin HTTPS üzerinden geldiğini görürse `Secure` bayrağını
+kendiliğinden ekler (`trust proxy` açıktır, `X-Forwarded-Proto` okunur). Ayrıca
+bir ayar yapman gerekmez.
+
+---
+
 ## API
 
 | Yöntem | Adres | Açıklama |
