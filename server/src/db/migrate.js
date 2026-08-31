@@ -28,7 +28,17 @@ async function addMissingColumns(conn, database) {
 }
 
 (async () => {
-  const conn = await serverConnection();
+  // Bağlantının kendisi de try içinde olmalı; dışarıda kalırsa erişilemeyen bir
+  // veritabanında yakalanmamış reddetme oluşur ve süreç çöker.
+  let conn;
+  try {
+    conn = await serverConnection();
+  } catch (err) {
+    console.error(`✖ Veritabanına bağlanılamadı (${config.user}@${config.host}:${config.port}): ${err.message}`);
+    process.exitCode = 1;
+    return;
+  }
+
   try {
     await conn.query(
       `CREATE DATABASE IF NOT EXISTS \`${config.database}\`

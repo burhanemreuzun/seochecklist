@@ -122,15 +122,32 @@ router.post('/auth/logout', (_req, res) => {
 });
 
 // ─────────────────────────── sağlık ───────────────────────────
+/**
+ * Sağlık ucu her koşulda hızlı yanıt vermelidir; dağıtım sorunları çoğunlukla
+ * buradan teşhis edilir. Veritabanı yanıt vermiyorsa beklemek yerine "kapalı"
+ * denir ve sebep birlikte döndürülür.
+ */
+const HEALTH_TIMEOUT_MS = 3000;
+
 router.get('/health', wrap(async (_req, res) => {
   let database = 'kapalı';
+  let dbError = null;
   try {
-    await db().query('SELECT 1');
+    await Promise.race([
+      db().query('SELECT 1'),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error(`Veritabanı ${HEALTH_TIMEOUT_MS} ms içinde yanıt vermedi.`)), HEALTH_TIMEOUT_MS)
+      ),
+    ]);
     database = 'açık';
-  } catch { /* kapalı kalır */ }
+  } catch (err) {
+    dbError = err.message;
+  }
   res.json({
     ok: database === 'açık',
     database,
+    ...(dbError ? { databaseError: dbError } : {}),
+    auth: process.env.APP_PASSWORD_HASH ? 'kurulu' : 'PAROLA TANIMLI DEĞİL',
     ai: process.env.GEMINI_API_KEY
       ? { enabled: true, model: process.env.GEMINI_MODEL || 'gemini-3.7-flash' }
       : { enabled: false, model: null },

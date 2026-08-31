@@ -16,7 +16,16 @@ const LISTS = [
 
 (async () => {
   const pool = getPool();
-  const conn = await pool.getConnection();
+  let conn;
+  try {
+    conn = await pool.getConnection();
+  } catch (err) {
+    console.error(`✖ Veritabanına bağlanılamadı: ${err.message}`);
+    process.exitCode = 1;
+    await pool.end().catch(() => {});
+    return;
+  }
+
   try {
     await conn.beginTransaction();
 

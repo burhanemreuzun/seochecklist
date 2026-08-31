@@ -43,7 +43,8 @@ if (!process.env.APP_PASSWORD_HASH) {
  * Kabuk erişimi olmayan sunucularda (paylaşımlı hosting, otomatik dağıtım)
  * tabloların ve maddelerin kurulmasını sağlar. Her iki işlem de yinelenebilir:
  * tablo varsa dokunmaz, madde varsa günceller.
- * Veritabanına ulaşılamazsa sunucu yine de ayağa kalkar; durum /api/health'te görünür.
+ * Sunucu dinlemeye başladıktan SONRA çalışır; veritabanına ulaşılamazsa uygulama
+ * yine de açık kalır ve durum /api/health üzerinden görülür.
  */
 async function autoMigrate() {
   if (process.env.AUTO_MIGRATE !== 'true') return;
@@ -52,7 +53,7 @@ async function autoMigrate() {
   const run = promisify(execFile);
   for (const script of ['db/migrate.js', 'db/seed.js']) {
     try {
-      const { stdout } = await run(process.execPath, [path.join(__dirname, script)], { timeout: 60000 });
+      const { stdout } = await run(process.execPath, [path.join(__dirname, script)], { timeout: 45000 });
       process.stdout.write(stdout);
     } catch (err) {
       console.error(`⚠ Otomatik kurulum adımı başarısız (${script}):`, err.stderr || err.message);
@@ -60,9 +61,12 @@ async function autoMigrate() {
   }
 }
 
-autoMigrate().finally(() => {
+// Port ÖNCE açılır. Veritabanı kurulumu arkada çalışır ve bağlanmayı asla
+// geciktirmez: aksi halde veritabanına ulaşılamadığında süreç hiç dinlemeye
+// başlamaz ve önündeki vekil sunucu 503 döndürür.
 app.listen(PORT, () => {
-  console.log(`▶ SEO Kontrol Listesi API  http://localhost:${PORT}`);
+  console.log(`▶ SEO Kontrol Listesi API  ${PORT} portunda`);
+  console.log(`  Veritabanı: ${process.env.DB_USER || 'root'}@${process.env.DB_HOST || '127.0.0.1'}:${process.env.DB_PORT || 3306}/${process.env.DB_NAME || 'seochecklist'}`);
   console.log(`  Yapay zekâ: ${process.env.GEMINI_API_KEY ? (process.env.GEMINI_MODEL || 'gemini-3.7-flash') : 'kapalı (GEMINI_API_KEY tanımlı değil)'}`);
-});
+  autoMigrate();
 });
