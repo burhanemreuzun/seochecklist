@@ -50,26 +50,26 @@ const isBlocker = computed(
             :disabled="busy"
             @change="emit('toggle', item.code, $event.target.checked)"
           />
-          <span class="tick" aria-hidden="true">✓</span>
+          <span class="tick" aria-hidden="true">&#10003;</span>
         </label>
-        <span v-else class="auto-dot" :class="'dot-' + status" :title="MODE_TEXT[item.mode]"></span>
+        <span v-else class="auto" :class="'auto-' + status" :title="MODE_TEXT[item.mode]"></span>
       </div>
 
       <button class="item-body" type="button" :aria-expanded="open" @click="open = !open">
-        <div class="label-line">
+        <span class="label">{{ item.label }}</span>
+        <span class="sub">
           <span class="code mono">{{ item.code }}</span>
-          <span class="label">{{ item.label }}</span>
-        </div>
-        <div class="sub mono">
+          <span class="sep">&middot;</span>
           <span class="sev" :class="'sev-' + item.severity">{{ SEVERITY_TEXT[item.severity] }}</span>
-          <span class="muted">· {{ MODE_TEXT[item.mode] }}</span>
-        </div>
+          <span class="sep">&middot;</span>
+          <span>{{ MODE_TEXT[item.mode] }}</span>
+        </span>
       </button>
 
       <div class="right">
         <span class="badge" :class="badgeClass">{{ STATUS_TEXT[status] }}</span>
         <button class="chev" type="button" :aria-label="open ? 'Kapat' : 'Ayrintiyi ac'" @click="open = !open">
-          <span :class="{ flip: open }">▾</span>
+          <span :class="{ flip: open }">&#9662;</span>
         </button>
       </div>
     </div>
@@ -83,28 +83,31 @@ const isBlocker = computed(
       <div v-if="open" class="detail">
         <div class="detail-grid">
           <div>
-            <div class="eyebrow">Neden onemli</div>
+            <div class="eyebrow bare">Neden onemli</div>
             <p>{{ item.why }}</p>
           </div>
           <div>
-            <div class="eyebrow">Nasil yapilir</div>
+            <div class="eyebrow bare">Nasil yapilir</div>
             <p>{{ item.how }}</p>
           </div>
         </div>
 
         <div v-if="finding?.message" class="detail-block">
-          <div class="eyebrow">Denetim sonucu <span class="src">{{ finding.source === 'ai' ? '· yapay zeka' : '· kural motoru' }}</span></div>
+          <div class="eyebrow bare">
+            Denetim sonucu
+            <span class="src">{{ finding.source === 'ai' ? 'yapay zeka' : 'kural motoru' }}</span>
+          </div>
           <p>{{ finding.message }}</p>
         </div>
 
         <div v-if="finding?.evidence" class="detail-block">
-          <div class="eyebrow">Sayfadaki kanit</div>
+          <div class="eyebrow bare">Sayfadaki kanit</div>
           <pre class="evidence mono">{{ finding.evidence }}</pre>
         </div>
 
-        <div v-if="check?.checked_by" class="detail-block muted mono tiny">
-          {{ check.checked_by }} tarafindan isaretlendi · {{ String(check.checked_at || '').slice(0, 16) }}
-          <template v-if="check.note"> · “{{ check.note }}”</template>
+        <div v-if="check?.checked_by" class="detail-block signoff">
+          {{ check.checked_by }} tarafindan isaretlendi &middot; {{ String(check.checked_at || '').slice(0, 16) }}
+          <template v-if="check.note"> &middot; &ldquo;{{ check.note }}&rdquo;</template>
         </div>
       </div>
     </Transition>
@@ -112,99 +115,116 @@ const isBlocker = computed(
 </template>
 
 <style scoped>
-.item { border-top: 1px solid var(--rule); position: relative; }
-.item:last-child { border-bottom: 1px solid var(--rule); }
-.item.blocker::before {
-  content: ''; position: absolute; left: -24px; top: 0; bottom: 0;
-  width: 3px; background: var(--red);
+.item {
+  position: relative;
+  border-bottom: 1px solid var(--line);
+  transition: background 0.16s ease;
 }
-.item.done .label { color: var(--ink-3); }
+.item:last-child { border-bottom: 0; }
+.item.blocker { background: linear-gradient(90deg, var(--fail-soft), transparent 42%); }
+.item.blocker::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 2px; background: var(--fail);
+}
+.item.done .label { color: var(--muted); }
 
-.item-head { display: flex; align-items: flex-start; gap: 12px; padding: 11px 0; }
+.item-head { display: flex; align-items: flex-start; gap: 14px; padding: 15px 20px; }
 
-.control { flex: none; padding-top: 3px; width: 22px; display: grid; place-items: center; }
+.control { flex: none; width: 20px; display: grid; place-items: center; padding-top: 2px; }
 
 /* Elle isaretleme kutusu */
 .chk { position: relative; display: grid; place-items: center; cursor: pointer; }
-.chk input { position: absolute; opacity: 0; width: 20px; height: 20px; margin: 0; cursor: pointer; }
+.chk input { position: absolute; inset: 0; opacity: 0; width: 20px; height: 20px; margin: 0; cursor: pointer; }
 .tick {
   width: 20px; height: 20px;
-  border: 1.5px solid var(--ink-3);
-  border-radius: 2px;
+  border: 1.5px solid var(--line-2);
+  border-radius: 7px;
   display: grid; place-items: center;
-  font-size: 13px; color: transparent;
-  transition: all 0.15s ease;
+  font-size: 12px; color: transparent;
+  transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease;
 }
-.chk.on .tick { background: var(--green); border-color: var(--green); color: #fff; }
-.chk input:focus-visible + .tick { outline: 2px solid var(--red); outline-offset: 2px; }
+.chk:hover .tick { border-color: var(--accent); }
+.chk.on .tick { background: var(--accent); border-color: var(--accent); color: #fff; }
+.chk input:focus-visible + .tick { box-shadow: 0 0 0 3px var(--accent-soft); }
 
 /* Otomatik madde gostergesi */
-.auto-dot {
-  width: 9px; height: 9px; border-radius: 50%;
-  border: 1.5px solid var(--rule-strong); background: transparent;
+.auto {
+  width: 8px; height: 8px; border-radius: 50%;
+  border: 1.5px solid var(--line-2); background: transparent;
 }
-.dot-pass { background: var(--green); border-color: var(--green); }
-.dot-warn { background: var(--amber); border-color: var(--amber); }
-.dot-fail { background: var(--red); border-color: var(--red); }
-.dot-skip { background: var(--rule-strong); }
+.auto-pass { background: var(--pass); border-color: var(--pass); }
+.auto-warn { background: var(--warn); border-color: var(--warn); }
+.auto-fail { background: var(--fail); border-color: var(--fail); }
+.auto-skip { background: var(--line-2); }
 
 .item-body {
   flex: 1; min-width: 0; text-align: left;
   background: none; border: 0; padding: 0; color: inherit; font: inherit;
+  display: flex; flex-direction: column; gap: 4px;
 }
-.label-line { display: flex; gap: 9px; align-items: baseline; }
-.code { flex: none; font-size: 10.5px; font-weight: 600; color: var(--ink-3); letter-spacing: 0.04em; padding-top: 2px; }
-.label { font-size: 14.5px; font-weight: 500; line-height: 1.4; }
-.sub { font-size: 10.5px; margin-top: 3px; letter-spacing: 0.05em; text-transform: uppercase; }
-.sev { font-weight: 600; }
+.label { font-size: 15px; font-weight: 500; letter-spacing: -0.02em; line-height: 1.45; }
+.sub { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+.code { font-size: 11px; letter-spacing: 0; }
+.sep { opacity: 0.45; }
+.sev { font-weight: 500; }
 
-.right { flex: none; display: flex; align-items: center; gap: 8px; padding-top: 1px; }
-.chev {
-  background: none; border: 0; color: var(--ink-3); font-size: 12px;
-  padding: 2px 4px; line-height: 1;
-}
-.chev span { display: inline-block; transition: transform 0.2s ease; }
+.right { flex: none; display: flex; align-items: center; gap: 6px; }
+.chev { background: none; border: 0; color: var(--muted); font-size: 11px; padding: 4px 2px; line-height: 1; }
+.chev span { display: inline-block; transition: transform 0.22s ease; }
 .chev .flip { transform: rotate(180deg); }
 
 .verdict {
-  margin: -4px 0 10px 34px;
-  padding-left: 11px;
-  border-left: 2px solid var(--rule-strong);
-  font-size: 13px;
+  margin: -6px 20px 15px 54px;
+  padding: 10px 14px;
+  border-radius: var(--r-input);
+  background: var(--surface);
+  border-left: 2px solid var(--line-2);
+  font-size: 13.5px;
   color: var(--ink-2);
 }
-.verdict.v-fail { border-color: var(--red); }
-.verdict.v-warn { border-color: var(--amber); }
-.verdict.v-manual { border-color: var(--blue); }
+.verdict.v-fail { background: var(--fail-soft); border-color: var(--fail); }
+.verdict.v-warn { background: var(--warn-soft); border-color: var(--warn); }
+.verdict.v-manual { background: var(--info-soft); border-color: var(--info); }
 
 .detail {
-  margin: 0 0 14px 34px;
-  padding: 14px 16px;
-  background: var(--paper);
-  border: 1px solid var(--rule);
-  border-radius: 2px;
+  margin: 0 20px 18px 54px;
+  padding: 20px 22px;
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-card);
 }
-.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-@media (max-width: 700px) { .detail-grid { grid-template-columns: 1fr; } }
-.detail p { margin: 5px 0 0; font-size: 13px; color: var(--ink-2); line-height: 1.55; }
-.detail-block { margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--rule); }
-.src { color: var(--ink-3); font-weight: 400; letter-spacing: 0.08em; }
-.tiny { font-size: 11px; }
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+@media (max-width: 720px) { .detail-grid { grid-template-columns: 1fr; gap: 18px; } }
+.detail p { margin: 7px 0 0; font-size: 13.5px; color: var(--ink-2); line-height: 1.6; }
+.detail-block { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line-2); }
+.src {
+  margin-left: 4px; padding: 2px 8px;
+  border-radius: var(--r-pill); background: var(--bg);
+  border: 1px solid var(--line); color: var(--muted);
+  letter-spacing: 0.06em;
+}
+.signoff { font-size: 12.5px; color: var(--muted); }
 
 .evidence {
-  margin: 6px 0 0;
-  padding: 9px 11px;
-  background: var(--paper-3);
-  border-radius: 2px;
-  font-size: 11.5px;
-  line-height: 1.6;
+  margin: 9px 0 0;
+  padding: 12px 14px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-input);
+  font-size: 12px;
+  line-height: 1.65;
   white-space: pre-wrap;
   word-break: break-word;
-  max-height: 220px;
+  max-height: 230px;
   overflow: auto;
   color: var(--ink-2);
 }
 
-.expand-enter-active, .expand-leave-active { transition: opacity 0.18s ease, transform 0.18s ease; }
-.expand-enter-from, .expand-leave-to { opacity: 0; transform: translateY(-4px); }
+.expand-enter-active, .expand-leave-active { transition: opacity 0.2s ease, transform 0.2s ease; }
+.expand-enter-from, .expand-leave-to { opacity: 0; transform: translateY(-6px); }
+
+@media (max-width: 720px) {
+  .item-head { padding: 14px 16px; gap: 12px; }
+  .verdict, .detail { margin-left: 16px; margin-right: 16px; }
+}
 </style>

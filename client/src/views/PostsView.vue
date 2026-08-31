@@ -63,11 +63,29 @@ const scoreClass = (s) =>
 onMounted(load);
 </script>
 
+
 <template>
   <div>
-    <!-- yeni yazi -->
-    <section class="card card-pad new-post rise">
-      <div class="eyebrow" style="margin-bottom: 14px">Yeni yazi kaydi ac</div>
+    <!-- hero -->
+    <header class="hero rise">
+      <div class="eyebrow">Yayin oncesi kontrol</div>
+      <h1 class="h1">
+        Yayinlamadan once<br />
+        <span class="soft">sayfayi denetleyelim.</span>
+      </h1>
+      <p class="lead hero-lead">
+        58 maddenin 47'si otomatik olculur &mdash; baslik, heading hiyerarsisi, meta aciklama,
+        alt metinler, canonical ve kirik linkler beyan edilmez, olculur.
+      </p>
+    </header>
+
+    <!-- yeni kayit -->
+    <section class="card card-pad new-post rise" style="animation-delay: 60ms">
+      <div class="new-head">
+        <h2 class="h3">Yeni yazi kaydi</h2>
+        <p class="muted new-sub">Basligi gir, URL'i sonra da ekleyebilirsin.</p>
+      </div>
+
       <form class="new-grid" @submit.prevent="create">
         <div class="field" style="grid-area: t">
           <label for="np-title">Yazi basligi</label>
@@ -78,59 +96,60 @@ onMounted(load);
           <input id="np-kw" v-model="form.focus_keyword" class="input" placeholder="kombi basinc ayari" />
         </div>
         <div class="field" style="grid-area: u">
-          <label for="np-url">URL <span class="muted" style="text-transform: none; letter-spacing: 0">(sonra da girilebilir)</span></label>
+          <label for="np-url">URL <span class="opt">opsiyonel</span></label>
           <input id="np-url" v-model="form.url" class="input mono" placeholder="https://site.com/kombi-basinc-ayari/" />
         </div>
-        <div style="grid-area: b; display: flex; align-items: flex-end">
+        <div class="submit-cell">
           <button class="btn btn-primary" type="submit" :disabled="creating || !form.title.trim()">
-            {{ creating ? 'Aciliyor…' : 'Kaydi ac →' }}
+            {{ creating ? 'Aciliyor' : 'Kaydi ac' }}
+            <span class="btn-arrow" aria-hidden="true">&#8594;</span>
           </button>
         </div>
       </form>
     </section>
 
-    <p v-if="error" class="err">{{ error }}</p>
+    <p v-if="error" class="notice">{{ error }}</p>
 
     <!-- liste -->
     <div class="spread list-head">
-      <div class="eyebrow">Kayitli yazilar <span v-if="posts.length">({{ posts.length }})</span></div>
-      <input v-model="filter" class="input search" placeholder="Ara…" />
+      <h2 class="h3">Kayitli yazilar <span class="count">{{ posts.length }}</span></h2>
+      <input v-model="filter" class="input search" placeholder="Ara" />
     </div>
 
-    <div v-if="loading" class="empty">Yukleniyor…</div>
+    <div v-if="loading" class="empty">Yukleniyor</div>
 
     <div v-else-if="!filtered.length" class="empty">
-      <div class="display">Liste bos.</div>
+      <div class="h2">Liste bos</div>
       <p>Yukaridan ilk yazi kaydini ac.</p>
     </div>
 
     <ul v-else class="post-list">
-      <li v-for="(p, i) in filtered" :key="p.id" class="post-row rise" :style="{ animationDelay: i * 28 + 'ms' }">
+      <li v-for="(p, i) in filtered" :key="p.id" class="post-row rise" :style="{ animationDelay: 80 + i * 30 + 'ms' }">
         <RouterLink :to="{ name: 'post', params: { id: p.id } }" class="post-link">
           <div class="score" :class="scoreClass(p.last_score)">
-            <template v-if="p.last_score !== null && p.last_score !== undefined">
-              <span class="score-num">{{ p.last_score }}</span>
-            </template>
-            <span v-else class="score-dash">—</span>
+            <span v-if="p.last_score !== null && p.last_score !== undefined">{{ p.last_score }}</span>
+            <span v-else class="dash">&ndash;</span>
           </div>
 
           <div class="grow post-main">
             <div class="post-title">{{ p.title }}</div>
-            <div class="post-meta mono">
+            <div class="post-meta">
               <span class="badge" :class="'badge-' + (p.status === 'published' ? 'pass' : p.status === 'review' ? 'warn' : 'skip')">
                 {{ STATUS_LABEL[p.status] }}
               </span>
-              <span v-if="p.focus_keyword">◆ {{ p.focus_keyword }}</span>
-              <span v-if="p.url" class="url-cell">{{ p.url }}</span>
+              <span v-if="p.focus_keyword" class="kw">{{ p.focus_keyword }}</span>
+              <span v-if="p.url" class="url-cell mono">{{ p.url }}</span>
               <span v-else class="muted">URL girilmemis</span>
             </div>
           </div>
 
-          <div class="post-side mono">
+          <div class="post-side">
             <div v-if="p.last_audit_at">{{ String(p.last_audit_at).slice(0, 16) }}</div>
             <div v-else class="muted">hic denetlenmedi</div>
             <div class="muted">{{ p.checked_count }} madde isaretli</div>
           </div>
+
+          <span class="go" aria-hidden="true">&#8594;</span>
         </RouterLink>
         <button class="btn btn-ghost btn-sm del" title="Sil" @click="remove(p)">Sil</button>
       </li>
@@ -139,88 +158,93 @@ onMounted(load);
 </template>
 
 <style scoped>
-.new-post { margin-bottom: 34px; }
+.hero { padding: 26px 0 54px; max-width: 760px; }
+.hero .h1 { margin: 16px 0 20px; }
+.hero .soft { color: var(--muted); }
+.hero-lead { max-width: 620px; margin: 0; }
+
+.new-post { margin-bottom: 66px; }
+.new-head { margin-bottom: 22px; }
+.new-sub { margin: 5px 0 0; font-size: 14px; }
+.opt { text-transform: none; letter-spacing: 0; color: #b3b3b3; font-weight: 400; }
+
 .new-grid {
   display: grid;
-  gap: 16px 18px;
-  grid-template-columns: 1.4fr 1fr auto;
-  grid-template-areas: 't k b' 'u u b';
+  gap: 18px 20px;
+  grid-template-columns: 1.35fr 1fr;
+  grid-template-areas: 't k' 'u u';
 }
-@media (max-width: 760px) {
-  .new-grid { grid-template-columns: 1fr; grid-template-areas: 't' 'k' 'u' 'b'; }
-}
-
-.err {
-  border-left: 3px solid var(--red);
-  background: var(--red-soft);
-  padding: 10px 14px;
-  margin: 0 0 20px;
-  font-size: 13.5px;
+.submit-cell { grid-column: 1 / -1; }
+@media (max-width: 720px) {
+  .new-grid { grid-template-columns: 1fr; grid-template-areas: 't' 'k' 'u'; }
 }
 
-.list-head { margin-bottom: 12px; align-items: center; }
-.search { width: 200px; padding: 6px 10px; font-size: 13px; }
+.list-head { margin-bottom: 18px; align-items: center; }
+.count { display: inline-block; margin-left: 6px; font-size: 13px; font-weight: 500; color: var(--muted); letter-spacing: 0; }
+.search { width: 210px; padding: 9px 15px; font-size: 13.5px; border-radius: var(--r-pill); }
 
-.post-list { list-style: none; margin: 0; padding: 0; }
+.post-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
 
 .post-row {
-  display: flex;
-  align-items: stretch;
-  border-top: 1px solid var(--rule);
-  transition: background 0.14s ease;
+  display: flex; align-items: stretch;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--bg);
+  transition: border-color 0.18s ease, background 0.18s ease;
 }
-.post-row:last-child { border-bottom: 1px solid var(--rule); }
-.post-row:hover { background: var(--paper-2); }
+.post-row:hover { border-color: var(--line-2); background: var(--surface); }
 .post-row:hover .del { opacity: 1; }
+.post-row:hover .go { opacity: 1; transform: none; }
 
 .post-link {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  padding: 15px 4px;
-  color: inherit;
-  text-decoration: none;
-  min-width: 0;
+  flex: 1; min-width: 0;
+  display: flex; align-items: center; gap: 20px;
+  padding: 18px 22px;
+  color: inherit; text-decoration: none;
 }
 
-/* Skor damgasi — duzeltmen muhru gibi */
 .score {
   flex: none;
-  width: 52px; height: 52px;
+  width: 50px; height: 50px;
   display: grid; place-items: center;
-  border: 2px solid currentColor;
   border-radius: 50%;
-  font-family: var(--mono);
-  font-weight: 600;
-  transform: rotate(-4deg);
+  border: 1px solid;
+  font-size: 16px; font-weight: 600; letter-spacing: -0.04em;
 }
-.score-num { font-size: 17px; letter-spacing: -0.03em; }
-.score-dash { font-size: 15px; }
-.score.good { color: var(--green); background: var(--green-soft); }
-.score.mid  { color: var(--amber); background: var(--amber-soft); }
-.score.bad  { color: var(--red);   background: var(--red-soft); }
-.score.none { color: var(--rule-strong); background: transparent; border-style: dashed; }
+.score .dash { opacity: 0.5; }
+.score.good { color: var(--pass); background: var(--pass-soft); border-color: var(--pass-line); }
+.score.mid  { color: var(--warn); background: var(--warn-soft); border-color: var(--warn-line); }
+.score.bad  { color: var(--fail); background: var(--fail-soft); border-color: var(--fail-line); }
+.score.none { color: var(--muted); background: var(--surface); border-color: var(--line-2); }
 
 .post-main { min-width: 0; }
-.post-title { font-weight: 600; font-size: 16px; letter-spacing: -0.01em; margin-bottom: 5px; }
-.post-meta {
-  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-  font-size: 11.5px; color: var(--ink-3);
-}
-.url-cell { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 340px; }
+.post-title { font-size: 16.5px; font-weight: 500; letter-spacing: -0.025em; margin-bottom: 7px; }
+.post-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 12.5px; color: var(--muted); }
+.kw { color: var(--ink-2); }
+.kw::before { content: '\25C6'; color: var(--peach); margin-right: 5px; font-size: 8px; vertical-align: middle; }
+.url-cell { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 330px; font-size: 11.5px; }
 
-.post-side { flex: none; text-align: right; font-size: 11px; color: var(--ink-2); line-height: 1.6; }
+.post-side { flex: none; text-align: right; font-size: 12px; color: var(--ink-2); line-height: 1.55; }
+
+.go {
+  flex: none; align-self: center;
+  width: 30px; height: 30px; display: grid; place-items: center;
+  border-radius: 50%; background: var(--dark); color: #fff; font-size: 13px;
+  opacity: 0; transform: translateX(-4px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
 
 .del {
-  align-self: center; margin-left: 12px;
-  opacity: 0; transition: opacity 0.14s ease;
-  color: var(--red); border-color: var(--rule);
+  align-self: center; margin: 0 16px 0 0;
+  opacity: 0; color: var(--fail);
+  transition: opacity 0.18s ease, border-color 0.18s ease;
 }
+.del:hover { border-color: var(--fail); }
 .del:focus-visible { opacity: 1; }
 
-@media (max-width: 700px) {
-  .post-side { display: none; }
-  .url-cell { max-width: 180px; }
+@media (max-width: 760px) {
+  .post-side, .go { display: none; }
+  .url-cell { max-width: 170px; }
+  .post-link { padding: 15px 16px; gap: 14px; }
 }
 </style>

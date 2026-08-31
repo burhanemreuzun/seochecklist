@@ -155,23 +155,23 @@ function catStat(cat) {
 </script>
 
 <template>
-  <div v-if="loading" class="empty">Yukleniyor…</div>
-  <div v-else-if="!post" class="empty"><div class="display">Yazi bulunamadi.</div></div>
+  <div v-if="loading" class="empty">Yukleniyor</div>
+  <div v-else-if="!post" class="empty"><div class="h2">Yazi bulunamadi</div></div>
 
-  <div v-else class="page">
-    <RouterLink to="/" class="back mono">← tum yazilar</RouterLink>
+  <div v-else>
+    <RouterLink to="/" class="back">&#8592; Tum yazilar</RouterLink>
 
-    <!-- ───────── ust panel ───────── -->
-    <section class="card control-panel rise">
-      <div class="cp-main">
+    <!-- ───────── kontrol paneli ───────── -->
+    <section class="panel rise">
+      <div class="panel-main">
         <input
-          class="title-input display"
+          class="title-input"
           :value="post.title"
           aria-label="Yazi basligi"
           @input="savePost({ title: $event.target.value })"
         />
 
-        <div class="cp-fields">
+        <div class="fields">
           <div class="field grow">
             <label for="cp-url">Denetlenecek URL</label>
             <input
@@ -196,53 +196,59 @@ function catStat(cat) {
           </div>
         </div>
 
-        <div class="cp-actions">
+        <div class="actions">
           <button class="btn btn-primary" :disabled="auditing || !post.url" @click="runAudit">
-            {{ auditing ? 'Denetleniyor…' : 'Kontrol Et' }}
+            {{ auditing ? 'Denetleniyor' : 'Kontrol Et' }}
+            <span class="btn-arrow" aria-hidden="true">&#8594;</span>
           </button>
-          <span class="mono tiny muted">
-            <template v-if="saving">kaydediliyor…</template>
-            <template v-else-if="audit?.created_at">son denetim: {{ String(audit.created_at).slice(0, 16) }}</template>
+          <span class="saved">
+            <template v-if="saving">kaydediliyor</template>
+            <template v-else-if="audit?.created_at">son denetim {{ String(audit.created_at).slice(0, 16) }}</template>
             <template v-else>henuz denetlenmedi</template>
           </span>
         </div>
       </div>
 
-      <!-- skor damgasi -->
-      <div class="cp-score">
-        <div class="stamp" :class="scoreClass">
-          <span v-if="score !== null" class="stamp-num">{{ score }}</span>
-          <span v-else class="stamp-dash">?</span>
-          <span class="stamp-cap mono">skor</span>
+      <!-- skor -->
+      <aside class="panel-score">
+        <div class="ring" :class="scoreClass" :style="{ '--pct': (score ?? 0) + '%' }">
+          <div class="ring-in">
+            <span v-if="score !== null" class="ring-num">{{ score }}</span>
+            <span v-else class="ring-num dim">&ndash;</span>
+            <span class="ring-cap">skor</span>
+          </div>
         </div>
-        <div class="tallies mono">
-          <span class="t t-pass">{{ summary.pass }} gecti</span>
-          <span class="t t-warn">{{ summary.warn }} uyari</span>
-          <span class="t t-fail">{{ summary.fail }} hata</span>
-          <span class="t t-manual">{{ summary.manual + summary.pending }} bekliyor</span>
-        </div>
-      </div>
+        <ul class="tallies">
+          <li><i class="d d-pass"></i>{{ summary.pass }} gecti</li>
+          <li><i class="d d-warn"></i>{{ summary.warn }} uyari</li>
+          <li><i class="d d-fail"></i>{{ summary.fail }} hata</li>
+          <li><i class="d d-wait"></i>{{ summary.manual + summary.pending }} bekliyor</li>
+        </ul>
+      </aside>
     </section>
 
-    <p v-if="error" class="err">{{ error }}</p>
+    <p v-if="error" class="notice">{{ error }}</p>
 
     <!-- ───────── yayin kapisi ───────── -->
     <section class="gate" :class="ready ? 'gate-ok' : 'gate-block'">
-      <div class="gate-mark display">{{ ready ? 'YAYINA HAZIR' : 'YAYINLAMA' }}</div>
+      <div class="gate-tag">
+        <span class="gate-led"></span>{{ ready ? 'Yayina hazir' : 'Yayinlama' }}
+      </div>
       <div class="gate-body">
         <template v-if="ready">
-          <p>Kritik maddelerin tamami temiz. Yayinlayabilirsin.</p>
+          <p class="gate-lead">Kritik maddelerin tamami temiz. Yayinlayabilirsin.</p>
         </template>
         <template v-else-if="!audit">
-          <p><strong>Once "Kontrol Et"e bas.</strong> Denetim calistirilmadan yayin onayi verilmez.</p>
+          <p class="gate-lead">Once <strong>Kontrol Et</strong>&#8217;e bas. Denetim calistirilmadan yayin onayi verilmez.</p>
         </template>
         <template v-else>
-          <p><strong>{{ blockers.length }} kritik madde acik.</strong> Bunlar kapanmadan yayinlama:</p>
+          <p class="gate-lead"><strong>{{ blockers.length }} kritik madde acik.</strong> Bunlar kapanmadan yayinlama.</p>
           <ul class="gate-list">
             <li v-for="b in blockers" :key="b.code">
-              <span class="mono code">{{ b.code }}</span> {{ b.label }}
-              <em v-if="findings[b.code]?.message" class="gate-why">— {{ findings[b.code].message }}</em>
-              <em v-else-if="b.mode === 'manual'" class="gate-why">— kontrol edip isaretlemedin</em>
+              <span class="mono gcode">{{ b.code }}</span>
+              <span class="glabel">{{ b.label }}</span>
+              <span v-if="findings[b.code]?.message" class="gwhy">{{ findings[b.code].message }}</span>
+              <span v-else-if="b.mode === 'manual'" class="gwhy">kontrol edip isaretlemedin</span>
             </li>
           </ul>
         </template>
@@ -252,31 +258,25 @@ function catStat(cat) {
     <!-- ───────── filtre ───────── -->
     <div class="filters">
       <button class="pill" :class="{ on: showOnly === 'all' }" @click="showOnly = 'all'">
-        Tumu <span class="mono">{{ items.length }}</span>
+        Tumu <span>{{ items.length }}</span>
       </button>
       <button class="pill" :class="{ on: showOnly === 'problems' }" @click="showOnly = 'problems'">
-        Sorunlular <span class="mono">{{ summary.fail + summary.warn }}</span>
+        Sorunlular <span>{{ summary.fail + summary.warn }}</span>
       </button>
       <button class="pill" :class="{ on: showOnly === 'manual' }" @click="showOnly = 'manual'">
-        Elle isaretlenecek <span class="mono">{{ summary.manual }}</span>
+        Elle isaretlenecek <span>{{ summary.manual }}</span>
       </button>
     </div>
 
     <!-- ───────── liste ───────── -->
-    <div v-if="!grouped.length" class="empty">
-      <div class="display">Bu filtrede madde yok.</div>
-    </div>
+    <div v-if="!grouped.length" class="empty"><div class="h2">Bu filtrede madde yok</div></div>
 
-    <section v-for="(cat, ci) in grouped" :key="cat.key" class="cat rise" :style="{ animationDelay: ci * 40 + 'ms' }">
+    <section v-for="(cat, ci) in grouped" :key="cat.key" class="cat rise" :style="{ animationDelay: ci * 45 + 'ms' }">
       <header class="cat-head">
-        <h2 class="display">
-          <span class="cat-icon">{{ cat.icon }}</span>{{ cat.label }}
-        </h2>
-        <div class="cat-stat mono">
-          <span :class="{ 'has-bad': catStat(cat).bad }">
-            {{ catStat(cat).done }}/{{ catStat(cat).total }}
-          </span>
-          <span v-if="catStat(cat).bad" class="cat-bad">· {{ catStat(cat).bad }} hata</span>
+        <h2 class="h3"><span class="cat-icon">{{ cat.icon }}</span>{{ cat.label }}</h2>
+        <div class="cat-stat">
+          <span class="cat-count">{{ catStat(cat).done }}/{{ catStat(cat).total }}</span>
+          <span v-if="catStat(cat).bad" class="cat-bad">{{ catStat(cat).bad }} hata</span>
         </div>
       </header>
       <ul class="cat-items">
@@ -292,118 +292,158 @@ function catStat(cat) {
       </ul>
     </section>
 
-    <p v-if="lastRun && !lastRun.ai.used" class="ai-note mono">
-      Not: yapay zeka degerlendirmesi calismadi — {{ lastRun.ai.reason }}
+    <p v-if="lastRun && !lastRun.ai.used" class="ai-note">
+      Yapay zeka degerlendirmesi calismadi &mdash; {{ lastRun.ai.reason }}
     </p>
   </div>
 </template>
 
 <style scoped>
-.back { display: inline-block; font-size: 11.5px; color: var(--ink-3); text-decoration: none; margin-bottom: 16px; }
-.back:hover { color: var(--red); }
+.back {
+  display: inline-block; margin-bottom: 22px;
+  font-size: 13.5px; color: var(--muted); text-decoration: none;
+  transition: color 0.16s ease;
+}
+.back:hover { color: var(--ink); }
 
-/* ───── ust panel ───── */
-.control-panel { display: flex; gap: 28px; padding: 24px 26px; margin-bottom: 22px; }
-.cp-main { flex: 1; min-width: 0; }
+/* ───── kontrol paneli ───── */
+.panel {
+  display: flex; gap: 40px;
+  padding: 30px 32px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  margin-bottom: 26px;
+}
+.panel-main { flex: 1; min-width: 0; }
 
 .title-input {
   width: 100%;
-  font-size: clamp(22px, 3vw, 30px);
-  border: 0; border-bottom: 1px dashed var(--rule-strong);
-  background: transparent; color: var(--ink);
-  padding: 0 0 7px; margin-bottom: 18px;
+  font-family: inherit;
+  font-size: clamp(24px, 3.4vw, 36px);
+  font-weight: 600; letter-spacing: -0.04em; line-height: 1.1;
+  color: var(--ink); background: transparent;
+  border: 0; border-bottom: 1px solid var(--line);
+  padding: 0 0 12px; margin: 0 0 24px;
+  transition: border-color 0.16s ease;
 }
-.title-input:focus { outline: 0; border-bottom-color: var(--red); }
+.title-input:focus { outline: none; border-bottom-color: var(--accent); }
 
-.cp-fields { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 16px; }
-.cp-fields .field { min-width: 150px; }
-.cp-fields .grow { flex: 1; min-width: 260px; }
+.fields { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
+.fields .field { min-width: 155px; }
+.fields .grow { flex: 1; min-width: 270px; }
 
-.cp-actions { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-.tiny { font-size: 11px; }
+.actions { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.saved { font-size: 13px; color: var(--muted); }
 
-/* skor damgasi */
-.cp-score { flex: none; display: flex; flex-direction: column; align-items: center; gap: 12px; }
-.stamp {
-  width: 108px; height: 108px;
+/* skor halkasi */
+.panel-score { flex: none; display: flex; flex-direction: column; align-items: center; gap: 18px; }
+.ring {
+  --pct: 0%;
+  width: 128px; height: 128px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: conic-gradient(currentColor var(--pct), var(--surface-2) 0);
+  transition: background 0.6s cubic-bezier(0.16, 0.8, 0.3, 1);
+}
+.ring-in {
+  width: 106px; height: 106px; border-radius: 50%;
+  background: var(--bg);
   display: grid; place-items: center; align-content: center;
-  border: 3px double currentColor; border-radius: 50%;
-  transform: rotate(-5deg);
-  animation: stamp 0.5s cubic-bezier(0.2, 0.8, 0.3, 1) both;
 }
-.stamp-num { font-family: var(--serif); font-size: 42px; line-height: 1; }
-.stamp-dash { font-family: var(--serif); font-size: 40px; line-height: 1; }
-.stamp-cap { font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; margin-top: 3px; }
-.stamp.good { color: var(--green); background: var(--green-soft); }
-.stamp.mid  { color: var(--amber); background: var(--amber-soft); }
-.stamp.bad  { color: var(--red);   background: var(--red-soft); }
-.stamp.none { color: var(--rule-strong); border-style: dashed; }
+.ring-num { font-size: 38px; font-weight: 600; letter-spacing: -0.05em; line-height: 1; color: var(--ink); }
+.ring-num.dim { color: var(--muted); }
+.ring-cap { font-size: 11px; letter-spacing: 0.13em; text-transform: uppercase; color: var(--muted); margin-top: 5px; }
+.ring.good { color: var(--pass); }
+.ring.mid  { color: var(--warn); }
+.ring.bad  { color: var(--fail); }
+.ring.none { color: var(--line-2); }
 
-.tallies { display: grid; gap: 2px; font-size: 10.5px; text-align: right; }
-.t-pass { color: var(--green); }
-.t-warn { color: var(--amber); }
-.t-fail { color: var(--red); }
-.t-manual { color: var(--blue); }
+.tallies { list-style: none; margin: 0; padding: 0; display: grid; gap: 5px; font-size: 12.5px; color: var(--ink-2); }
+.tallies li { display: flex; align-items: center; gap: 8px; }
+.d { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+.d-pass { background: var(--pass); }
+.d-warn { background: var(--warn); }
+.d-fail { background: var(--fail); }
+.d-wait { background: var(--info); }
 
-@media (max-width: 780px) {
-  .control-panel { flex-direction: column-reverse; }
-  .cp-score { flex-direction: row; justify-content: flex-start; align-items: center; gap: 18px; }
-  .tallies { text-align: left; }
+@media (max-width: 820px) {
+  .panel { flex-direction: column-reverse; gap: 26px; padding: 24px 20px; }
+  .panel-score { flex-direction: row; justify-content: flex-start; gap: 24px; }
 }
-
-.err { border-left: 3px solid var(--red); background: var(--red-soft);
-  padding: 10px 14px; margin: 0 0 18px; font-size: 13.5px; }
 
 /* ───── yayin kapisi ───── */
 .gate {
-  display: flex; gap: 22px; align-items: flex-start;
-  padding: 18px 22px; margin-bottom: 30px;
-  border: 2px solid; border-radius: 2px;
+  display: flex; gap: 26px; align-items: flex-start;
+  padding: 24px 28px; margin-bottom: 44px;
+  border: 1px solid; border-radius: var(--r-card);
 }
-.gate-ok { border-color: var(--green); background: var(--green-soft); }
-.gate-block { border-color: var(--red); background: var(--red-soft); }
-.gate-mark {
-  flex: none; font-size: 19px; letter-spacing: 0.04em;
-  padding: 5px 12px; border: 2px solid currentColor; border-radius: 2px;
-  transform: rotate(-3deg); white-space: nowrap;
+.gate-ok { background: var(--pass-soft); border-color: var(--pass-line); }
+.gate-block { background: var(--fail-soft); border-color: var(--fail-line); }
+
+.gate-tag {
+  flex: none; display: inline-flex; align-items: center; gap: 8px;
+  padding: 7px 16px; border-radius: var(--r-pill);
+  background: var(--bg); border: 1px solid;
+  font-size: 13px; font-weight: 500; letter-spacing: -0.015em; white-space: nowrap;
 }
-.gate-ok .gate-mark { color: var(--green); }
-.gate-block .gate-mark { color: var(--red); }
+.gate-ok .gate-tag { color: var(--pass); border-color: var(--pass-line); }
+.gate-block .gate-tag { color: var(--fail); border-color: var(--fail-line); }
+.gate-led { width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex: none; }
+.gate-block .gate-led { animation: pulse 1.9s ease-in-out infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.28; } }
+
 .gate-body { flex: 1; min-width: 0; }
-.gate-body p { margin: 4px 0 0; font-size: 13.5px; }
-.gate-list { margin: 9px 0 0; padding-left: 0; list-style: none; font-size: 13px; }
-.gate-list li { padding: 3px 0; border-top: 1px dotted rgba(22,19,15,0.18); }
-.gate-list .code { font-size: 10.5px; color: var(--ink-3); margin-right: 6px; }
-.gate-why { color: var(--ink-2); font-style: italic; }
-@media (max-width: 640px) { .gate { flex-direction: column; } }
+.gate-lead { margin: 3px 0 0; font-size: 14.5px; color: var(--ink); }
+.gate-list { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 1px; }
+.gate-list li {
+  display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+  padding: 9px 0; border-top: 1px solid rgba(0, 0, 0, 0.07);
+  font-size: 13.5px;
+}
+.gcode { flex: none; font-size: 11px; color: var(--muted); }
+.glabel { font-weight: 500; }
+.gwhy { color: var(--ink-2); }
+@media (max-width: 640px) { .gate { flex-direction: column; padding: 20px; } }
 
 /* ───── filtre ───── */
-.filters { display: flex; gap: 8px; margin-bottom: 22px; flex-wrap: wrap; }
+.filters { display: flex; gap: 9px; margin-bottom: 30px; flex-wrap: wrap; }
 .pill {
-  padding: 6px 13px; border: 1px solid var(--rule-strong); border-radius: 2px;
-  background: transparent; color: var(--ink-2); font-size: 12.5px; font-weight: 500;
-  transition: all 0.14s ease;
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 8px 17px;
+  border: 1px solid var(--line); border-radius: var(--r-pill);
+  background: var(--bg); color: var(--ink-2);
+  font-size: 13.5px; font-weight: 500; letter-spacing: -0.015em;
+  transition: all 0.16s ease;
 }
-.pill span { color: var(--ink-3); font-size: 11px; margin-left: 4px; }
-.pill:hover { border-color: var(--ink); }
-.pill.on { background: var(--ink); border-color: var(--ink); color: var(--paper-2); }
-.pill.on span { color: var(--rule-strong); }
+.pill span { color: var(--muted); font-size: 12px; }
+.pill:hover { border-color: var(--ink); color: var(--ink); }
+.pill.on { background: var(--dark); border-color: var(--dark); color: #fff; }
+.pill.on span { color: rgba(255, 255, 255, 0.55); }
 
 /* ───── kategoriler ───── */
 .cat { margin-bottom: 34px; }
 .cat-head {
-  display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
-  padding-bottom: 8px; border-bottom: 2px solid var(--ink);
+  display: flex; align-items: center; justify-content: space-between; gap: 18px;
+  margin-bottom: 14px;
 }
-.cat-head h2 { font-size: 23px; margin: 0; display: flex; align-items: center; gap: 10px; }
+.cat-head .h3 { display: flex; align-items: center; gap: 11px; }
 .cat-icon { font-size: 17px; }
-.cat-stat { font-size: 11px; color: var(--ink-3); letter-spacing: 0.06em; }
-.cat-stat .has-bad { color: var(--ink-2); }
-.cat-bad { color: var(--red); }
-.cat-items { list-style: none; margin: 0; padding: 0; }
+.cat-stat { display: flex; align-items: center; gap: 10px; font-size: 12.5px; }
+.cat-count { color: var(--muted); }
+.cat-bad {
+  padding: 3px 11px; border-radius: var(--r-pill);
+  background: var(--fail-soft); border: 1px solid var(--fail-line); color: var(--fail);
+  font-size: 11.5px;
+}
+.cat-items {
+  list-style: none; margin: 0; padding: 0;
+  border: 1px solid var(--line); border-radius: var(--r-card);
+  overflow: hidden;
+}
 
 .ai-note {
-  font-size: 11.5px; color: var(--ink-3);
-  border-top: 1px solid var(--rule); padding-top: 12px;
+  margin-top: 34px; padding: 14px 18px;
+  background: var(--surface); border: 1px solid var(--line-2);
+  border-radius: var(--r-input);
+  font-size: 13px; color: var(--muted);
 }
 </style>

@@ -102,6 +102,7 @@ npm run check https://siteadi.com/yazi-adresi/ "odak anahtar kelime"
 
 ```
 client/                Vue 3 + Vite arayuz
+  src/assets/main.css  tasarim sistemi (Inter Tight · pill formlar · duz yuzeyler)
   src/views/           PostsView (liste) · PostView (kontrol tezgahi)
   src/components/      ChecklistItem
 server/
